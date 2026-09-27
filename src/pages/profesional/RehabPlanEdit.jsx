@@ -51,7 +51,7 @@ export default function RehabPlanEdit() {
         await base44.entities.RehabPlan.create({ ...form, patient_id: patientId });
       }
       toast.success('Plan guardado');
-      navigate(`/profesional/paciente/${patientId}`);
+      navigate(`/kinesiologo/paciente/${patientId}`);
     } catch (e) {
       toast.error('No se pudo guardar el plan');
     } finally {
@@ -64,7 +64,7 @@ export default function RehabPlanEdit() {
 
   return (
     <div>
-      <Link to={`/profesional/paciente/${patientId}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
+      <Link to={`/kinesiologo/paciente/${patientId}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
         <ArrowLeft className="w-4 h-4" /> Volver a la ficha
       </Link>
       <h1 className="text-xl font-semibold text-slate-900 mb-5">Plan de rehabilitación · {patient.full_name}</h1>

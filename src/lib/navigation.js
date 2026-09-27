@@ -26,13 +26,12 @@ export const PACIENTE_NAV = [
 ];
 
 export const PROFESIONAL_NAV = [
-  { to: '/profesional', label: 'Inicio', icon: Home, end: true },
-  { to: '/profesional', label: 'Pacientes', icon: Users, end: true },
-  { to: '/profesional/sesion/nueva', label: 'Nueva sesión', icon: CalendarPlus },
-  { to: '/profesional/sesiones', label: 'Sesiones', icon: CalendarDays },
-  { to: '/profesional/seguimiento', label: 'Seguimiento', icon: Activity },
-  { to: '/profesional/dispositivo', label: 'Dispositivo', icon: Cpu },
-  { to: '/profesional/perfil', label: 'Perfil', icon: User },
+  { to: '/kinesiologo/pacientes', label: 'Pacientes', icon: Users, end: true },
+  { to: '/kinesiologo/sesion/nueva', label: 'Nueva sesión', icon: CalendarPlus },
+  { to: '/kinesiologo/sesiones', label: 'Sesiones', icon: CalendarDays },
+  { to: '/kinesiologo/seguimiento', label: 'Seguimiento', icon: Activity },
+  { to: '/kinesiologo/dispositivo', label: 'Dispositivo', icon: Cpu },
+  { to: '/kinesiologo/perfil', label: 'Perfil', icon: User },
 ];
 
 export const AREA_LABELS = {

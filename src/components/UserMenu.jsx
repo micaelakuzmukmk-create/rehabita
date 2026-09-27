@@ -1,7 +1,7 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import { getEffectiveRole, setDemoRole, clearDemoRole } from '@/lib/rehbaita';
+import { setDemoRole, clearDemoRole } from '@/lib/rehbaita';
 import { AREA_LABELS } from '@/lib/navigation';
 import {
   DropdownMenu,
@@ -16,14 +16,14 @@ import { ArrowLeftRight, LogOut, ChevronDown } from 'lucide-react';
 export default function UserMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const role = getEffectiveRole(user);
-  const isAdminPreview = user?.role === 'admin';
+  const location = useLocation();
+  const area = location.pathname.startsWith('/kinesiologo') ? 'professional' : 'patient';
   const initial = (user?.full_name || user?.email || 'U').charAt(0).toUpperCase();
 
   function switchRole() {
-    const next = role === 'professional' ? 'patient' : 'professional';
+    const next = area === 'professional' ? 'patient' : 'professional';
     setDemoRole(next);
-    navigate(next === 'professional' ? '/profesional' : '/paciente', { replace: true });
+    navigate(next === 'professional' ? '/kinesiologo/pacientes' : '/paciente', { replace: true });
   }
 
   function handleLogout() {
@@ -48,16 +48,14 @@ export default function UserMenu() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col">
             <span className="text-sm text-slate-800 truncate">{user?.full_name || user?.email || 'Usuario'}</span>
-            <span className="text-xs text-slate-400">Área {AREA_LABELS[role] || 'Paciente'}</span>
+            <span className="text-xs text-slate-400">Área {AREA_LABELS[area]}</span>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {isAdminPreview && (
-          <DropdownMenuItem onClick={switchRole} className="cursor-pointer">
-            <ArrowLeftRight className="w-4 h-4 mr-2" />
-            Cambiar vista
-          </DropdownMenuItem>
-        )}
+        <DropdownMenuItem onClick={switchRole} className="cursor-pointer">
+          <ArrowLeftRight className="w-4 h-4 mr-2" />
+          Cambiar vista
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-rose-600 focus:text-rose-700">
           <LogOut className="w-4 h-4 mr-2" />
           Salir

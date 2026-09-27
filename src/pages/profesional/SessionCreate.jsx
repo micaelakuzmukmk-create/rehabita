@@ -141,7 +141,7 @@ export default function SessionCreate() {
       });
       try { await base44.entities.Device.update(deviceId, { status: 'disponible' }); } catch {}
       toast.success('Sesión guardada');
-      navigate(`/profesional/sesion/${session.id}`);
+      navigate(`/kinesiologo/sesion/${session.id}`);
     } catch (e) {
       toast.error('No se pudo guardar la sesión');
     } finally {
@@ -156,7 +156,7 @@ export default function SessionCreate() {
 
   let content;
   switch (step) {
-    case 0: content = <PatientStep patient={patient} plan={plan} sessionsCount={sessionsCount} onBack={() => navigate(`/profesional/paciente/${patientId}`)} onNext={() => setStep(1)} />; break;
+    case 0: content = <PatientStep patient={patient} plan={plan} sessionsCount={sessionsCount} onBack={() => navigate(`/kinesiologo/paciente/${patientId}`)} onNext={() => setStep(1)} />; break;
     case 1: content = <PhaseStep phase={phase} setPhase={setPhase} plan={plan} onBack={() => setStep(0)} onNext={() => setStep(2)} />; break;
     case 2: content = <ExerciseStep exercises={exercises} selected={selected} toggle={toggleExercise} phase={phase} onBack={() => setStep(1)} onNext={() => setStep(3)} />; break;
     case 3: content = <DeviceStep devices={devices} deviceId={deviceId} setDeviceId={setDeviceId} onBack={() => setStep(2)} onNext={() => setStep(4)} />; break;
@@ -171,7 +171,7 @@ export default function SessionCreate() {
 
   return (
     <div>
-      <Link to={`/profesional/paciente/${patientId}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
+      <Link to={`/kinesiologo/paciente/${patientId}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
         <ArrowLeft className="w-4 h-4" /> Volver a la ficha
       </Link>
       <h1 className="text-xl font-semibold text-slate-900">Nueva sesión · {patient.full_name}</h1>

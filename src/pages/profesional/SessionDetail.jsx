@@ -84,7 +84,7 @@ export default function SessionDetail() {
 
   return (
     <div>
-      <Link to={`/profesional/paciente/${session.patient_id}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
+      <Link to={`/kinesiologo/paciente/${session.patient_id}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
         <ArrowLeft className="w-4 h-4" /> Volver a la ficha
       </Link>
 

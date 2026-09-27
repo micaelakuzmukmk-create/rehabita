@@ -86,7 +86,7 @@ export default function PatientDetail() {
 
   return (
     <div>
-      <Link to="/profesional" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
+      <Link to="/kinesiologo/pacientes" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
         <ArrowLeft className="w-4 h-4" /> Volver a pacientes
       </Link>
 
@@ -100,7 +100,7 @@ export default function PatientDetail() {
           </div>
         </div>
         <Link
-          to={`/profesional/paciente/${patientId}/sesion/nueva`}
+          to={`/kinesiologo/paciente/${patientId}/sesion/nueva`}
           className="inline-flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800"
         >
           <Plus className="w-4 h-4" /> Nueva sesión
@@ -156,7 +156,7 @@ export default function PatientDetail() {
           {[...sessions].sort((a, b) => new Date(b.date) - new Date(a.date)).map((s, i) => (
             <Link
               key={s.id}
-              to={`/profesional/sesion/${s.id}`}
+              to={`/kinesiologo/sesion/${s.id}`}
               className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 hover:border-slate-300"
             >
               <div className="flex items-center gap-3">
@@ -183,7 +183,7 @@ export default function PatientDetail() {
             <div>
               <div className="flex items-center justify-between">
                 <h3 className="font-medium text-slate-900">{plan.title}</h3>
-                <Link to={`/profesional/paciente/${patientId}/plan`} className="text-sm text-blue-600 hover:underline">Editar plan</Link>
+                <Link to={`/kinesiologo/paciente/${patientId}/plan`} className="text-sm text-blue-600 hover:underline">Editar plan</Link>
               </div>
               <p className="text-sm text-slate-600 mt-2">{plan.description}</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 text-sm">
@@ -202,7 +202,7 @@ export default function PatientDetail() {
           ) : (
             <div className="text-sm text-slate-400 flex items-center justify-between">
               Sin plan de rehabilitación
-              <Link to={`/profesional/paciente/${patientId}/plan`} className="inline-flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg bg-slate-900 text-white">
+              <Link to={`/kinesiologo/paciente/${patientId}/plan`} className="inline-flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg bg-slate-900 text-white">
                 <ClipboardList className="w-4 h-4" /> Crear plan
               </Link>
             </div>

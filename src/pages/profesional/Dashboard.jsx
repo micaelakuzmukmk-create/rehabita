@@ -68,7 +68,7 @@ export default function ProfessionalDashboard() {
             return (
               <Link
                 key={p.id}
-                to={`/profesional/paciente/${p.id}`}
+                to={`/kinesiologo/paciente/${p.id}`}
                 className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 hover:border-slate-300 hover:shadow-sm transition"
               >
                 <div className="flex items-center gap-4">

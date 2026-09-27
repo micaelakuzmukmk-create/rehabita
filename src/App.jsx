@@ -4,7 +4,7 @@ import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Layout from '@/components/Layout';
-import Home from '@/pages/Home';
+import SelectProfile from '@/pages/SelectProfile';
 import ProfessionalDashboard from '@/pages/profesional/Dashboard';
 import PatientDetail from '@/pages/profesional/PatientDetail';
 import SessionCreate from '@/pages/profesional/SessionCreate';
@@ -55,18 +55,10 @@ const AuthenticatedApp = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/" element={<Navigate to="/seleccionar-perfil" replace />} />
+        <Route path="/seleccionar-perfil" element={<SelectProfile />} />
         <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/profesional" element={<ProfessionalDashboard />} />
-          <Route path="/profesional/paciente/:patientId" element={<PatientDetail />} />
-          <Route path="/profesional/paciente/:patientId/sesion/nueva" element={<SessionCreate />} />
-          <Route path="/profesional/paciente/:patientId/plan" element={<RehabPlanEdit />} />
-          <Route path="/profesional/sesion/nueva" element={<AreaPlaceholder title="Nueva sesión" description="Seleccioná un paciente desde el listado de Pacientes para iniciar una nueva sesión." icon={Construction} />} />
-          <Route path="/profesional/sesiones" element={<AreaPlaceholder title="Sesiones" description="Listado general de sesiones del profesional." icon={Construction} />} />
-          <Route path="/profesional/seguimiento" element={<AreaPlaceholder title="Seguimiento" description="Seguimiento global de pacientes y planes activos." icon={Construction} />} />
-          <Route path="/profesional/dispositivo" element={<AreaPlaceholder title="Dispositivo" description="Estado y calibración de los dispositivos de medición." icon={Construction} />} />
-          <Route path="/profesional/perfil" element={<AreaPlaceholder title="Perfil" description="Datos del profesional a cargo." icon={Construction} />} />
-          <Route path="/profesional/sesion/:sessionId" element={<SessionDetail />} />
+          {/* Área Paciente */}
           <Route path="/paciente" element={<PatientDashboard />} />
           <Route path="/paciente/progreso" element={<AreaPlaceholder title="Mi progreso" description="Evolución detallada de tus indicadores de rehabilitación." icon={Construction} />} />
           <Route path="/paciente/sesiones" element={<AreaPlaceholder title="Mis sesiones" description="Historial de tus sesiones de rehabilitación." icon={Construction} />} />
@@ -75,6 +67,17 @@ const AuthenticatedApp = () => {
           <Route path="/paciente/reportes" element={<AreaPlaceholder title="Reportes" description="Reportes de evolución para compartir con tu kinesiólogo." icon={Construction} />} />
           <Route path="/paciente/perfil" element={<AreaPlaceholder title="Perfil" description="Tus datos personales y de rehabilitación." icon={Construction} />} />
           <Route path="/paciente/sesion/:sessionId" element={<PatientSessionReport />} />
+          {/* Área Kinesiólogo */}
+          <Route path="/kinesiologo/pacientes" element={<ProfessionalDashboard />} />
+          <Route path="/kinesiologo/paciente/:patientId" element={<PatientDetail />} />
+          <Route path="/kinesiologo/paciente/:patientId/sesion/nueva" element={<SessionCreate />} />
+          <Route path="/kinesiologo/paciente/:patientId/plan" element={<RehabPlanEdit />} />
+          <Route path="/kinesiologo/sesion/nueva" element={<AreaPlaceholder title="Nueva sesión" description="Seleccioná un paciente desde el listado de Pacientes para iniciar una nueva sesión." icon={Construction} />} />
+          <Route path="/kinesiologo/sesiones" element={<AreaPlaceholder title="Sesiones" description="Listado general de sesiones del profesional." icon={Construction} />} />
+          <Route path="/kinesiologo/seguimiento" element={<AreaPlaceholder title="Seguimiento" description="Seguimiento global de pacientes y planes activos." icon={Construction} />} />
+          <Route path="/kinesiologo/dispositivo" element={<AreaPlaceholder title="Dispositivo" description="Estado y calibración de los dispositivos de medición." icon={Construction} />} />
+          <Route path="/kinesiologo/perfil" element={<AreaPlaceholder title="Perfil" description="Datos del profesional a cargo." icon={Construction} />} />
+          <Route path="/kinesiologo/sesion/:sessionId" element={<SessionDetail />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
