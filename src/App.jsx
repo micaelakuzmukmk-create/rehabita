@@ -17,6 +17,8 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import PageNotFound from './lib/PageNotFound';
+import AreaPlaceholder from '@/components/AreaPlaceholder';
+import { Construction } from 'lucide-react';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
@@ -59,8 +61,19 @@ const AuthenticatedApp = () => {
           <Route path="/profesional/paciente/:patientId" element={<PatientDetail />} />
           <Route path="/profesional/paciente/:patientId/sesion/nueva" element={<SessionCreate />} />
           <Route path="/profesional/paciente/:patientId/plan" element={<RehabPlanEdit />} />
+          <Route path="/profesional/sesion/nueva" element={<AreaPlaceholder title="Nueva sesión" description="Seleccioná un paciente desde el listado de Pacientes para iniciar una nueva sesión." icon={Construction} />} />
+          <Route path="/profesional/sesiones" element={<AreaPlaceholder title="Sesiones" description="Listado general de sesiones del profesional." icon={Construction} />} />
+          <Route path="/profesional/seguimiento" element={<AreaPlaceholder title="Seguimiento" description="Seguimiento global de pacientes y planes activos." icon={Construction} />} />
+          <Route path="/profesional/dispositivo" element={<AreaPlaceholder title="Dispositivo" description="Estado y calibración de los dispositivos de medición." icon={Construction} />} />
+          <Route path="/profesional/perfil" element={<AreaPlaceholder title="Perfil" description="Datos del profesional a cargo." icon={Construction} />} />
           <Route path="/profesional/sesion/:sessionId" element={<SessionDetail />} />
           <Route path="/paciente" element={<PatientDashboard />} />
+          <Route path="/paciente/progreso" element={<AreaPlaceholder title="Mi progreso" description="Evolución detallada de tus indicadores de rehabilitación." icon={Construction} />} />
+          <Route path="/paciente/sesiones" element={<AreaPlaceholder title="Mis sesiones" description="Historial de tus sesiones de rehabilitación." icon={Construction} />} />
+          <Route path="/paciente/comparar" element={<AreaPlaceholder title="Comparar sesiones" description="Compará tus métricas entre sesiones." icon={Construction} />} />
+          <Route path="/paciente/plan" element={<AreaPlaceholder title="Plan de rehabilitación" description="Detalle de tu plan y etapa actual." icon={Construction} />} />
+          <Route path="/paciente/reportes" element={<AreaPlaceholder title="Reportes" description="Reportes de evolución para compartir con tu kinesiólogo." icon={Construction} />} />
+          <Route path="/paciente/perfil" element={<AreaPlaceholder title="Perfil" description="Tus datos personales y de rehabilitación." icon={Construction} />} />
           <Route path="/paciente/sesion/:sessionId" element={<PatientSessionReport />} />
         </Route>
       </Route>
