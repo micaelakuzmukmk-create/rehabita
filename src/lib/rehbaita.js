@@ -65,6 +65,15 @@ export function qualitative(metricKey, value) {
   return 'A mejorar';
 }
 
+// Compara el valor actual con el de la sesión anterior.
+export function metricDelta(metricKey, current, previous) {
+  const m = METRIC_MAP[metricKey];
+  if (!m || current == null || previous == null) return null;
+  const delta = Math.round((current - previous) * 10) / 10;
+  const improved = m.higherBetter ? delta >= 0 : delta <= 0;
+  return { delta, improved };
+}
+
 export const PHASE_LABELS = {
   proteccion: 'Protección',
   movilidad: 'Movilidad',

@@ -46,6 +46,18 @@
     "calibration_id": {
       "type": "string"
     },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "proteccion",
+        "movilidad",
+        "fuerza",
+        "propiocepcion",
+        "retorno_deportivo"
+      ],
+      "default": "proteccion",
+      "description": "Etapa de rehabilitaci\u00f3n de la sesi\u00f3n"
+    },
     "notes": {
       "type": "string"
     }

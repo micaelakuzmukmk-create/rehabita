@@ -1,28 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { METRICS } from '@/lib/rehbaita';
-import { ArrowLeft, Check, Dumbbell, Gauge, Play, Square, Sparkles } from 'lucide-react';
-import { format } from 'date-fns';
+import { ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Stepper from '@/components/session/Stepper';
+import PatientStep from '@/components/session/PatientStep';
+import PhaseStep from '@/components/session/PhaseStep';
+import ExerciseStep from '@/components/session/ExerciseStep';
+import DeviceStep from '@/components/session/DeviceStep';
+import CalibrationStep from '@/components/session/CalibrationStep';
+import StartStep from '@/components/session/StartStep';
+import LiveMeasureStep from '@/components/session/LiveMeasureStep';
+import FinalizarStep from '@/components/session/FinalizarStep';
+import ResultsStep from '@/components/session/ResultsStep';
+import CommentStep from '@/components/session/CommentStep';
 
-const STEPS = ['Ejercicios', 'Calibración', 'Sesión', 'Mediciones'];
+const STEP_LABELS = ['Paciente', 'Etapa', 'Ejercicio', 'Dispositivo', 'Calibración', 'Inicio', 'Medición', 'Finalizar', 'Resultados', 'Guardar'];
+const REST_KEYS = ['reaction_time', 'movement_control', 'strength', 'pain_perceived', 'confidence_perceived'];
+const LIVE_KEYS = ['symmetry', 'load_distribution', 'stability', 'knee_flexion_angle'];
 
 export default function SessionCreate() {
   const { patientId } = useParams();
   const navigate = useNavigate();
   const [patient, setPatient] = useState(null);
+  const [plan, setPlan] = useState(null);
   const [exercises, setExercises] = useState([]);
   const [devices, setDevices] = useState([]);
   const [sessionsCount, setSessionsCount] = useState(0);
+  const [prevMetrics, setPrevMetrics] = useState(null);
   const [step, setStep] = useState(0);
+  const [phase, setPhase] = useState('proteccion');
   const [selected, setSelected] = useState([]);
-  const [device, setDevice] = useState('');
+  const [deviceId, setDeviceId] = useState('');
   const [calibration, setCalibration] = useState(null);
-  const [calibrating, setCalibrating] = useState(false);
   const [session, setSession] = useState(null);
-  const [metrics, setMetrics] = useState(() => Object.fromEntries(METRICS.map(m => [m.key, ''])));
+  const [liveMetrics, setLiveMetrics] = useState({});
+  const [duration, setDuration] = useState(0);
+  const [resultMetrics, setResultMetrics] = useState(() => Object.fromEntries(REST_KEYS.map(k => [k, ''])));
+  const [comment, setComment] = useState('');
+  const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+  const [starting, setStarting] = useState(false);
 
   useEffect(() => { load(); }, [patientId]);
 
@@ -38,31 +56,27 @@ export default function SessionCreate() {
       setExercises(ex);
       setDevices(dv);
       setSessionsCount(ss.length);
-      if (dv[0]) setDevice(dv[0].id);
+      const avail = dv.find(d => d.status === 'disponible');
+      if (avail) setDeviceId(avail.id);
+      else if (dv[0]) setDeviceId(dv[0].id);
+      const plans = await base44.entities.RehabPlan.filter({ patient_id: patientId, status: 'activo' }, '-created_date', 5);
+      if (plans[0]) { setPlan(plans[0]); setPhase(plans[0].current_phase || 'proteccion'); }
+      const prev = ss.find(s => s.status === 'completada');
+      if (prev) {
+        const pm = await base44.entities.SessionMetrics.filter({ session_id: prev.id });
+        if (pm[0]) setPrevMetrics(pm[0]);
+      }
     } catch (e) {
       toast.error('No se pudo cargar la información');
     }
   }
 
   function toggleExercise(id) {
-    setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
-  }
-
-  function runCalibration() {
-    setCalibrating(true);
-    setTimeout(() => {
-      setCalibration({
-        baseline_symmetry: 60 + Math.random() * 15,
-        baseline_stability: 55 + Math.random() * 15,
-        baseline_load: 58 + Math.random() * 12,
-        status: 'exitosa',
-      });
-      setCalibrating(false);
-      toast.success('Calibración exitosa');
-    }, 1400);
+    setSelected(s => (s.includes(id) ? s.filter(x => x !== id) : [...s, id]));
   }
 
   async function startSession() {
+    setStarting(true);
     try {
       const created = await base44.entities.Session.create({
         patient_id: patientId,
@@ -70,10 +84,12 @@ export default function SessionCreate() {
         session_number: sessionsCount + 1,
         status: 'en_progreso',
         exercises: selected,
-        device_id: device,
+        device_id: deviceId,
+        phase,
+        rehab_plan_id: plan?.id,
       });
       const cal = await base44.entities.Calibration.create({
-        device_id: device,
+        device_id: deviceId,
         session_id: created.id,
         date: new Date().toISOString(),
         baseline_symmetry: calibration.baseline_symmetry,
@@ -82,37 +98,49 @@ export default function SessionCreate() {
         status: 'exitosa',
       });
       await base44.entities.Session.update(created.id, { calibration_id: cal.id });
+      try { await base44.entities.Device.update(deviceId, { status: 'en_uso' }); } catch {}
       setSession({ ...created, calibration_id: cal.id });
-      setStep(2);
+      setStep(6);
       toast.success('Sesión iniciada');
     } catch (e) {
       toast.error('No se pudo iniciar la sesión');
+    } finally {
+      setStarting(false);
     }
   }
 
-  function simulateMetrics() {
-    const next = {};
-    METRICS.forEach(m => {
-      if (m.key === 'reaction_time') next[m.key] = Math.round(380 + Math.random() * 220);
-      else if (m.key === 'knee_flexion_angle') next[m.key] = Math.round(95 + Math.random() * 35);
-      else if (m.key === 'pain_perceived') next[m.key] = Math.round(Math.random() * 5 * 10) / 10;
-      else next[m.key] = Math.round((40 + Math.random() * 50) * 10) / 10;
-    });
-    setMetrics(next);
-    toast('Mediciones simuladas');
+  function handleLiveFinal(vals, secs) {
+    setLiveMetrics(vals);
+    setDuration(secs);
+    setStep(7);
   }
 
-  async function finishSession() {
+  async function saveSession() {
     setSaving(true);
     try {
       const payload = { session_id: session.id, patient_id: patientId };
-      METRICS.forEach(m => {
-        const v = metrics[m.key];
-        payload[m.key] = v === '' ? null : Number(v);
-      });
+      LIVE_KEYS.forEach(k => { const v = liveMetrics[k]; payload[k] = v == null ? null : Number(v); });
+      REST_KEYS.forEach(k => { const v = resultMetrics[k]; payload[k] = v === '' || v == null ? null : Number(v); });
       await base44.entities.SessionMetrics.create(payload);
-      await base44.entities.Session.update(session.id, { status: 'completada', duration_min: 45 });
-      toast.success('Sesión finalizada');
+      if (comment.trim()) {
+        await base44.entities.ProfessionalComment.create({
+          patient_id: patientId,
+          session_id: session.id,
+          professional_id: patient?.professional_id || plan?.professional_id || '',
+          content: comment.trim(),
+          date: new Date().toISOString(),
+        });
+      }
+      if (plan && phase !== plan.current_phase) {
+        try { await base44.entities.RehabPlan.update(plan.id, { current_phase: phase }); } catch {}
+      }
+      await base44.entities.Session.update(session.id, {
+        status: 'completada',
+        duration_min: Math.max(1, Math.round(duration / 60)),
+        notes: notes || undefined,
+      });
+      try { await base44.entities.Device.update(deviceId, { status: 'disponible' }); } catch {}
+      toast.success('Sesión guardada');
       navigate(`/profesional/sesion/${session.id}`);
     } catch (e) {
       toast.error('No se pudo guardar la sesión');
@@ -123,149 +151,34 @@ export default function SessionCreate() {
 
   if (!patient) return <div className="text-sm text-slate-400">Cargando…</div>;
 
+  const selectedNames = exercises.filter(e => selected.includes(e.id)).map(e => e.name);
+  const device = devices.find(d => d.id === deviceId);
+
+  let content;
+  switch (step) {
+    case 0: content = <PatientStep patient={patient} plan={plan} sessionsCount={sessionsCount} onBack={() => navigate(`/profesional/paciente/${patientId}`)} onNext={() => setStep(1)} />; break;
+    case 1: content = <PhaseStep phase={phase} setPhase={setPhase} plan={plan} onBack={() => setStep(0)} onNext={() => setStep(2)} />; break;
+    case 2: content = <ExerciseStep exercises={exercises} selected={selected} toggle={toggleExercise} phase={phase} onBack={() => setStep(1)} onNext={() => setStep(3)} />; break;
+    case 3: content = <DeviceStep devices={devices} deviceId={deviceId} setDeviceId={setDeviceId} onBack={() => setStep(2)} onNext={() => setStep(4)} />; break;
+    case 4: content = <CalibrationStep calibration={calibration} setCalibration={setCalibration} onBack={() => setStep(3)} onNext={() => setStep(5)} />; break;
+    case 5: content = <StartStep patient={patient} phase={phase} exerciseNames={selectedNames} device={device} calibration={calibration} starting={starting} onStart={startSession} onBack={() => setStep(4)} />; break;
+    case 6: content = <LiveMeasureStep calibration={calibration} exerciseNames={selectedNames} onFinal={handleLiveFinal} onBack={() => setStep(5)} />; break;
+    case 7: content = <FinalizarStep liveMetrics={liveMetrics} durationSec={duration} onBack={() => setStep(6)} onNext={() => setStep(8)} />; break;
+    case 8: content = <ResultsStep liveMetrics={liveMetrics} prevMetrics={prevMetrics} resultMetrics={resultMetrics} setResultMetrics={setResultMetrics} onBack={() => setStep(7)} onNext={() => setStep(9)} />; break;
+    case 9: content = <CommentStep comment={comment} setComment={setComment} notes={notes} setNotes={setNotes} saving={saving} onSave={saveSession} onBack={() => setStep(8)} />; break;
+    default: content = null;
+  }
+
   return (
     <div>
       <Link to={`/profesional/paciente/${patientId}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
         <ArrowLeft className="w-4 h-4" /> Volver a la ficha
       </Link>
       <h1 className="text-xl font-semibold text-slate-900">Nueva sesión · {patient.full_name}</h1>
-
-      <div className="flex items-center gap-2 mt-4 mb-6">
-        {STEPS.map((s, i) => (
-          <div key={s} className="flex items-center gap-2">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs ${i < step ? 'bg-emerald-500 text-white' : i === step ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-500'}`}>
-              {i < step ? <Check className="w-3.5 h-3.5" /> : i + 1}
-            </div>
-            <span className={`text-sm ${i === step ? 'text-slate-900 font-medium' : 'text-slate-400'}`}>{s}</span>
-            {i < STEPS.length - 1 && <div className="w-6 h-px bg-slate-200 mx-1" />}
-          </div>
-        ))}
+      <Stepper labels={STEP_LABELS} current={step} />
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
+        {content}
       </div>
-
-      {/* Step 0: Ejercicios */}
-      {step === 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-slate-700"><Dumbbell className="w-4 h-4" /> Seleccioná los ejercicios de la sesión</div>
-          <div className="grid sm:grid-cols-2 gap-2">
-            {exercises.map(ex => {
-              const on = selected.includes(ex.id);
-              return (
-                <button
-                  key={ex.id}
-                  onClick={() => toggleExercise(ex.id)}
-                  className={`text-left rounded-xl border p-3 transition ${on ? 'border-slate-900 bg-slate-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-sm text-slate-900">{ex.name}</span>
-                    {on && <Check className="w-4 h-4 text-emerald-600" />}
-                  </div>
-                  <div className="text-xs text-slate-500 mt-0.5 capitalize">{ex.category} · {ex.difficulty}</div>
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex justify-between items-center pt-3">
-            <div className="text-sm text-slate-500">Dispositivo:</div>
-            <select value={device} onChange={e => setDevice(e.target.value)} className="text-sm rounded-lg border border-slate-200 px-3 py-2 bg-white">
-              {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-            </select>
-          </div>
-          <div className="flex justify-end pt-2">
-            <button onClick={() => setStep(1)} disabled={selected.length === 0} className="text-sm px-4 py-2 rounded-lg bg-slate-900 text-white disabled:opacity-40">
-              Continuar a calibración
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Step 1: Calibración */}
-      {step === 1 && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-slate-700"><Gauge className="w-4 h-4" /> Calibración inicial del dispositivo</div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5">
-            {!calibration && !calibrating && (
-              <button onClick={runCalibration} className="text-sm px-4 py-2 rounded-lg bg-slate-900 text-white">
-                Iniciar calibración
-              </button>
-            )}
-            {calibrating && (
-              <div className="flex items-center gap-3 text-sm text-slate-600">
-                <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-700 rounded-full animate-spin" />
-                Calibrando sensores…
-              </div>
-            )}
-            {calibration && (
-              <div>
-                <div className="grid grid-cols-3 gap-3">
-                  <Baseline label="Simetría base" value={calibration.baseline_symmetry} unit="%" />
-                  <Baseline label="Estabilidad base" value={calibration.baseline_stability} unit="" />
-                  <Baseline label="Carga base" value={calibration.baseline_load} unit="%" />
-                </div>
-                <div className="text-xs text-emerald-600 mt-3 flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Calibración exitosa</div>
-              </div>
-            )}
-          </div>
-          <div className="flex justify-between pt-2">
-            <button onClick={() => setStep(0)} className="text-sm text-slate-500">Atrás</button>
-            <button onClick={startSession} disabled={!calibration} className="text-sm px-4 py-2 rounded-lg bg-slate-900 text-white disabled:opacity-40 inline-flex items-center gap-1.5">
-              <Play className="w-4 h-4" /> Iniciar sesión
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Step 2: Sesión en progreso */}
-      {step === 2 && (
-        <div className="space-y-4">
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center gap-2 text-sm text-emerald-700">
-            <Play className="w-4 h-4" /> Sesión en progreso · {selected.length} ejercicios seleccionados
-          </div>
-          <button onClick={() => setStep(3)} className="text-sm px-4 py-2 rounded-lg bg-slate-900 text-white inline-flex items-center gap-1.5">
-            <Square className="w-4 h-4" /> Registrar mediciones y finalizar
-          </button>
-        </div>
-      )}
-
-      {/* Step 3: Mediciones */}
-      {step === 3 && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="text-slate-700 text-sm">Registrá las mediciones de la sesión</div>
-            <button onClick={simulateMetrics} className="text-sm inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:border-slate-300">
-              <Sparkles className="w-4 h-4 text-amber-500" /> Simular medición
-            </button>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {METRICS.map(m => (
-              <div key={m.key} className="rounded-xl border border-slate-200 bg-white p-3">
-                <label className="text-xs text-slate-500">{m.label} ({m.unit})</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={metrics[m.key]}
-                  onChange={e => setMetrics(s => ({ ...s, [m.key]: e.target.value }))}
-                  className="w-full mt-1 text-sm rounded-lg border border-slate-200 px-2 py-1.5 focus:outline-none focus:border-slate-400"
-                />
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between pt-2">
-            <button onClick={() => setStep(2)} className="text-sm text-slate-500">Atrás</button>
-            <button onClick={finishSession} disabled={saving} className="text-sm px-4 py-2 rounded-lg bg-emerald-600 text-white disabled:opacity-40 inline-flex items-center gap-1.5">
-              <Check className="w-4 h-4" /> {saving ? 'Guardando…' : 'Finalizar sesión'}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Baseline({ label, value, unit }) {
-  return (
-    <div className="rounded-lg bg-slate-50 p-3">
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className="text-lg font-semibold text-slate-900">{Math.round(value * 10) / 10}<span className="text-xs text-slate-400 ml-1">{unit}</span></div>
     </div>
   );
 }

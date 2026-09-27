@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { METRICS } from '@/lib/rehbaita';
+import { METRICS, PHASE_LABELS } from '@/lib/rehbaita';
 import MetricChart from '@/components/MetricChart';
 import MetricCard from '@/components/MetricCard';
 import { ArrowLeft, FileText, MessageSquare } from 'lucide-react';
@@ -95,7 +95,10 @@ export default function SessionDetail() {
             {patient?.full_name} · {format(parseISO(session.date), "dd/MM/yyyy HH:mm")}
           </div>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full ${session.status === 'completada' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{session.status}</span>
+        <div className="flex items-center gap-2">
+          {session.phase && <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">{PHASE_LABELS[session.phase]}</span>}
+          <span className={`text-xs px-2 py-1 rounded-full ${session.status === 'completada' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{session.status}</span>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
