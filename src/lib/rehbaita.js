@@ -1,15 +1,18 @@
 // Utilidades compartidas de rehbaita
 
 // Determina el rol efectivo para la interfaz.
-// Usuarios reales con rol professional/patient usan su rol.
-// Admins (preview) usan un rol de demo guardado en localStorage.
+// 1) Admin (modo demostración): usa la vista elegida temporalmente en localStorage.
+//    No modifica su rol real ni tipo_usuario; solo cambia la vista para presentar/probar.
+// 2) Usuario real: usa su tipo_usuario (paciente => patient, kinesiologo => professional).
+//    Si no tiene tipo_usuario asignado, devuelve null (perfil no asignado).
 export function getEffectiveRole(user) {
   if (!user) return null;
-  if (user.role === 'professional' || user.role === 'patient') return user.role;
   if (user.role === 'admin') {
     return localStorage.getItem('rehbaita_demo_role') || 'professional';
   }
-  return 'professional';
+  if (user.tipo_usuario === 'paciente') return 'patient';
+  if (user.tipo_usuario === 'kinesiologo') return 'professional';
+  return null;
 }
 
 export function setDemoRole(role) {

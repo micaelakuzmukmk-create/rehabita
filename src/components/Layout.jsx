@@ -1,24 +1,45 @@
-import React from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Activity } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
+import { useAuth } from '@/lib/AuthContext';
+import { getEffectiveRole } from '@/lib/rehbaita';
 import UserMenu from '@/components/UserMenu';
 import { PACIENTE_NAV, PROFESIONAL_NAV, AREA_LABELS } from '@/lib/navigation';
 
 export default function Layout() {
+  const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const isSelection = location.pathname === '/';
-  const area = location.pathname.startsWith('/profesional') ? 'professional' : 'patient';
-  const nav = area === 'professional' ? PROFESIONAL_NAV : PACIENTE_NAV;
+  const role = getEffectiveRole(user);
+  const isAdmin = user?.role === 'admin';
+  const allowedArea = role === 'professional' ? 'professional' : 'patient';
+  const routeArea = location.pathname.startsWith('/profesional') ? 'professional'
+    : location.pathname.startsWith('/paciente') ? 'patient' : null;
+
+  // Restringe el acceso por perfil real (no por la selección visual de demo):
+  // - usuario real sin perfil asignado -> vuelve a la pantalla de asignación;
+  // - usuario real que entra al área del otro perfil -> lo redirige a la suya.
+  // El admin (demo) puede navegar ambas áreas libremente.
+  useEffect(() => {
+    if (isSelection || !user) return;
+    if (!isAdmin && !role) { navigate('/', { replace: true }); return; }
+    if (!isAdmin && routeArea && routeArea !== allowedArea) {
+      navigate(allowedArea === 'professional' ? '/profesional' : '/paciente', { replace: true });
+    }
+  }, [isSelection, user, isAdmin, role, routeArea, allowedArea, navigate]);
 
   // Pantalla de selección de perfil (modo demostración): sin sidebar.
   if (isSelection) {
-    return (
-      <div className="min-h-screen bg-slate-50">
-        <Outlet />
-      </div>
-    );
+    return <div className="min-h-screen bg-slate-50"><Outlet /></div>;
   }
+
+  // Hasta resolver el perfil, no renderizamos el shell.
+  if (!role) return null;
+
+  const nav = role === 'professional' ? PROFESIONAL_NAV : PACIENTE_NAV;
+  const areaLabel = AREA_LABELS[role];
 
   const renderNavItems = (itemClass, iconClass) =>
     nav.map(item => {
@@ -57,7 +78,7 @@ export default function Layout() {
           )}
         </nav>
         <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400">
-          Área {AREA_LABELS[area]}
+          {isAdmin ? 'Modo demostración' : `Área ${areaLabel}`}
         </div>
       </aside>
 
@@ -66,13 +87,12 @@ export default function Layout() {
         <header className="sticky top-0 z-30 bg-white border-b border-slate-200">
           <div className="h-14 px-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {/* Logo visible solo en mobile (en desktop está en el sidebar) */}
               <div className="md:hidden w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
                 <Activity className="w-4 h-4 text-white" />
               </div>
               <span className="md:hidden font-semibold tracking-tight text-slate-900">rehbaita</span>
               <span className="hidden md:inline text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                Área {AREA_LABELS[area]}
+                {isAdmin ? 'Modo demostración' : `Área ${areaLabel}`}
               </span>
             </div>
             <UserMenu />

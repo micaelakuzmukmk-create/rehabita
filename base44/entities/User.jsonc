@@ -2,11 +2,18 @@
   "properties": {
     "role": {
       "type": "string",
-      "description": "Rol del usuario en la app",
+      "description": "Rol de permisos en la plataforma (admin gestiona usuarios; user es un usuario final)",
       "enum": [
         "admin",
-        "professional",
-        "patient"
+        "user"
+      ]
+    },
+    "tipo_usuario": {
+      "type": "string",
+      "description": "Tipo de perfil del usuario autenticado: determina el \u00e1rea de interfaz que le corresponde",
+      "enum": [
+        "paciente",
+        "kinesiologo"
       ]
     }
   },
