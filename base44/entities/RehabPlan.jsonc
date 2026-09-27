@@ -1,0 +1,54 @@
+{
+  "properties": {
+    "patient_id": {
+      "type": "string"
+    },
+    "professional_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "target_end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "goals": {
+      "type": "string",
+      "description": "Objetivos del plan"
+    },
+    "current_phase": {
+      "type": "string",
+      "enum": [
+        "proteccion",
+        "movilidad",
+        "fuerza",
+        "propiocepcion",
+        "retorno_deportivo"
+      ],
+      "default": "proteccion"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "activo",
+        "completado",
+        "pausa"
+      ],
+      "default": "activo"
+    }
+  },
+  "required": [
+    "patient_id",
+    "title"
+  ],
+  "name": "RehabPlan",
+  "type": "object"
+}

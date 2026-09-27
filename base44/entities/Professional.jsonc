@@ -1,0 +1,30 @@
+{
+  "properties": {
+    "full_name": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario vinculado"
+    },
+    "license_number": {
+      "type": "string",
+      "description": "Matr\u00edcula profesional"
+    },
+    "specialty": {
+      "type": "string",
+      "description": "Especialidad dentro de kinesiolog\u00eda"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "full_name"
+  ],
+  "name": "Professional",
+  "type": "object"
+}

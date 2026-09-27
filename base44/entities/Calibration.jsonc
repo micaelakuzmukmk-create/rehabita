@@ -1,0 +1,44 @@
+{
+  "properties": {
+    "device_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "professional_id": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "baseline_symmetry": {
+      "type": "number"
+    },
+    "baseline_stability": {
+      "type": "number"
+    },
+    "baseline_load": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "exitosa",
+        "fallida",
+        "pendiente"
+      ],
+      "default": "exitosa"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "device_id",
+    "date"
+  ],
+  "name": "Calibration",
+  "type": "object"
+}

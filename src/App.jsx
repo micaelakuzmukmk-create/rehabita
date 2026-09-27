@@ -1,7 +1,21 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Layout from '@/components/Layout';
+import Home from '@/pages/Home';
+import ProfessionalDashboard from '@/pages/profesional/Dashboard';
+import PatientDetail from '@/pages/profesional/PatientDetail';
+import SessionCreate from '@/pages/profesional/SessionCreate';
+import SessionDetail from '@/pages/profesional/SessionDetail';
+import RehabPlanEdit from '@/pages/profesional/RehabPlanEdit';
+import PatientDashboard from '@/pages/paciente/Dashboard';
+import PatientSessionReport from '@/pages/paciente/SessionReport';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -34,7 +48,22 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/profesional" element={<ProfessionalDashboard />} />
+          <Route path="/profesional/paciente/:patientId" element={<PatientDetail />} />
+          <Route path="/profesional/paciente/:patientId/sesion/nueva" element={<SessionCreate />} />
+          <Route path="/profesional/paciente/:patientId/plan" element={<RehabPlanEdit />} />
+          <Route path="/profesional/sesion/:sessionId" element={<SessionDetail />} />
+          <Route path="/paciente" element={<PatientDashboard />} />
+          <Route path="/paciente/sesion/:sessionId" element={<PatientSessionReport />} />
+        </Route>
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

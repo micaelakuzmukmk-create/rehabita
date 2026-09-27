@@ -1,0 +1,51 @@
+{
+  "properties": {
+    "session_id": {
+      "type": "string"
+    },
+    "patient_id": {
+      "type": "string"
+    },
+    "symmetry": {
+      "type": "number",
+      "description": "Simetr\u00eda entre miembros (0-100 %)"
+    },
+    "load_distribution": {
+      "type": "number",
+      "description": "Distribuci\u00f3n de carga (0-100 %)"
+    },
+    "stability": {
+      "type": "number",
+      "description": "Estabilidad (0-100)"
+    },
+    "reaction_time": {
+      "type": "number",
+      "description": "Tiempo de reacci\u00f3n (ms)"
+    },
+    "movement_control": {
+      "type": "number",
+      "description": "Control de movimiento (0-100)"
+    },
+    "strength": {
+      "type": "number",
+      "description": "Fuerza (0-100)"
+    },
+    "knee_flexion_angle": {
+      "type": "number",
+      "description": "\u00c1ngulo de flexi\u00f3n de rodilla (grados)"
+    },
+    "pain_perceived": {
+      "type": "number",
+      "description": "Dolor percibido (0-10)"
+    },
+    "confidence_perceived": {
+      "type": "number",
+      "description": "Confianza percibida (0-100)"
+    }
+  },
+  "required": [
+    "session_id"
+  ],
+  "name": "SessionMetrics",
+  "type": "object"
+}

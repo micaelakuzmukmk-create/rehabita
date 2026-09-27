@@ -1,0 +1,29 @@
+{
+  "properties": {
+    "patient_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Sesi\u00f3n asociada (opcional)"
+    },
+    "professional_id": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string",
+      "description": "Comentario escrito manualmente por el kinesi\u00f3logo"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "patient_id",
+    "content",
+    "date"
+  ],
+  "name": "ProfessionalComment",
+  "type": "object"
+}

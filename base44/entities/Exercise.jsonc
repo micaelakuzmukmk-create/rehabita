@@ -1,0 +1,43 @@
+{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "movilidad",
+        "fuerza",
+        "propiocepcion",
+        "potencia",
+        "retorno_deportivo",
+        "estiramiento"
+      ]
+    },
+    "target_muscle": {
+      "type": "string",
+      "description": "M\u00fasculo o grupo muscular objetivo"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "baja",
+        "media",
+        "alta"
+      ],
+      "default": "media"
+    },
+    "instructions": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "category"
+  ],
+  "name": "Exercise",
+  "type": "object"
+}

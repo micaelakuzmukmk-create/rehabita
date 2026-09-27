@@ -1,0 +1,35 @@
+{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "serial_number": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "sensor_inercial",
+        "plataforma_fuerza",
+        "goniometro",
+        "electromiografo"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "disponible",
+        "en_uso",
+        "calibrando",
+        "mantenimiento"
+      ],
+      "default": "disponible"
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ],
+  "name": "Device",
+  "type": "object"
+}

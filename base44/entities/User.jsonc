@@ -1,0 +1,18 @@
+{
+  "properties": {
+    "role": {
+      "type": "string",
+      "description": "Rol del usuario en la app",
+      "enum": [
+        "admin",
+        "professional",
+        "patient"
+      ]
+    }
+  },
+  "required": [
+    "role"
+  ],
+  "name": "User",
+  "type": "object"
+}

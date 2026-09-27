@@ -1,0 +1,67 @@
+{
+  "properties": {
+    "full_name": {
+      "type": "string",
+      "description": "Nombre completo del paciente"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario vinculado (si tiene login)"
+    },
+    "professional_id": {
+      "type": "string",
+      "description": "ID del profesional responsable"
+    },
+    "birth_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de nacimiento"
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "masculino",
+        "femenino",
+        "otro"
+      ]
+    },
+    "injury_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de la lesi\u00f3n"
+    },
+    "injury_side": {
+      "type": "string",
+      "enum": [
+        "izquierda",
+        "derecha"
+      ],
+      "description": "Rodilla lesionada"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas cl\u00ednicas generales"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "activo",
+        "pausa",
+        "alta"
+      ],
+      "default": "activo"
+    }
+  },
+  "required": [
+    "full_name",
+    "injury_side"
+  ],
+  "name": "Patient",
+  "type": "object"
+}

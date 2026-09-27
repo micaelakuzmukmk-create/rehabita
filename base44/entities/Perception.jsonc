@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "patient_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Sesi\u00f3n asociada (opcional)"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "pain_level": {
+      "type": "number",
+      "description": "Nivel de dolor percibido (0-10)"
+    },
+    "confidence_level": {
+      "type": "number",
+      "description": "Nivel de confianza corporal (0-100)"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "date"
+  ],
+  "name": "Perception",
+  "type": "object"
+}

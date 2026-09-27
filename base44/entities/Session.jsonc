@@ -1,0 +1,59 @@
+{
+  "properties": {
+    "patient_id": {
+      "type": "string"
+    },
+    "professional_id": {
+      "type": "string"
+    },
+    "rehab_plan_id": {
+      "type": "string"
+    },
+    "session_number": {
+      "type": "number",
+      "description": "N\u00famero de sesi\u00f3n del paciente"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora de la sesi\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "programada",
+        "calibrando",
+        "en_progreso",
+        "completada",
+        "cancelada"
+      ],
+      "default": "programada"
+    },
+    "duration_min": {
+      "type": "number",
+      "description": "Duraci\u00f3n en minutos"
+    },
+    "exercises": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs de ejercicios seleccionados"
+    },
+    "device_id": {
+      "type": "string"
+    },
+    "calibration_id": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "date"
+  ],
+  "name": "Session",
+  "type": "object"
+}

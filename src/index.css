@@ -90,3 +90,9 @@
     @apply bg-background text-foreground font-body;
   }
 }
+
+@layer components {
+  .input {
+    @apply w-full text-sm rounded-lg border border-slate-200 px-3 py-2 bg-white focus:outline-none focus:border-slate-400;
+  }
+}
