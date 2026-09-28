@@ -13,6 +13,7 @@ import RehabPlanEdit from '@/pages/profesional/RehabPlanEdit';
 import PatientDashboard from '@/pages/paciente/Dashboard';
 import PatientSessionReport from '@/pages/paciente/SessionReport';
 import PatientProgress from '@/pages/paciente/Progress';
+import PatientSessions from '@/pages/paciente/Sessions';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -62,7 +63,7 @@ const AuthenticatedApp = () => {
           {/* Área Paciente */}
           <Route path="/paciente" element={<PatientDashboard />} />
           <Route path="/paciente/progreso" element={<PatientProgress />} />
-          <Route path="/paciente/sesiones" element={<AreaPlaceholder title="Mis sesiones" description="Historial de tus sesiones de rehabilitación." icon={Construction} />} />
+          <Route path="/paciente/sesiones" element={<PatientSessions />} />
           <Route path="/paciente/comparar" element={<AreaPlaceholder title="Comparar sesiones" description="Compará tus métricas entre sesiones." icon={Construction} />} />
           <Route path="/paciente/plan" element={<AreaPlaceholder title="Plan de rehabilitación" description="Detalle de tu plan y etapa actual." icon={Construction} />} />
           <Route path="/paciente/reportes" element={<AreaPlaceholder title="Reportes" description="Reportes de evolución para compartir con tu kinesiólogo." icon={Construction} />} />
