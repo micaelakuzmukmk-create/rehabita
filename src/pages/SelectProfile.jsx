@@ -19,7 +19,7 @@ export default function SelectProfile() {
           <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center">
             <Activity className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-semibold tracking-tight text-slate-900">rehbaita</span>
+          <span className="text-xl font-semibold tracking-tight text-slate-900">ReHabita</span>
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 text-center">Seleccioná un perfil</h1>
@@ -62,7 +62,7 @@ export default function SelectProfile() {
         </div>
 
         {/* Leyenda */}
-        <p className="text-sm text-slate-400 mt-8">Seleccioná cómo querés ingresar a REHBAITA</p>
+        <p className="text-sm text-slate-400 mt-8">Seleccioná cómo querés ingresar a ReHabita</p>
       </div>
 
       <footer className="text-center text-xs text-slate-400 pb-6">

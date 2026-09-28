@@ -39,7 +39,7 @@ export default function Layout() {
           <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
             <Activity className="w-4 h-4 text-white" />
           </div>
-          <span className="font-semibold tracking-tight text-slate-900">rehbaita</span>
+          <span className="font-semibold tracking-tight text-slate-900">ReHabita</span>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {renderNavItems(
@@ -58,7 +58,7 @@ export default function Layout() {
               <div className="md:hidden w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
                 <Activity className="w-4 h-4 text-white" />
               </div>
-              <span className="md:hidden font-semibold tracking-tight text-slate-900">rehbaita</span>
+              <span className="md:hidden font-semibold tracking-tight text-slate-900">ReHabita</span>
               <span className="hidden md:inline text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
                 Área {areaLabel}
               </span>

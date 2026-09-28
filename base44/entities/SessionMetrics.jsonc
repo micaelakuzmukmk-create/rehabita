@@ -1,4 +1,6 @@
 {
+  "name": "SessionMetrics",
+  "type": "object",
   "properties": {
     "session_id": {
       "type": "string"
@@ -30,6 +32,22 @@
       "type": "number",
       "description": "Fuerza (0-100)"
     },
+    "strength_vastus_medialis": {
+      "type": "number",
+      "description": "Fuerza cu\u00e1driceps vasto interno (0-100)"
+    },
+    "strength_vastus_lateralis": {
+      "type": "number",
+      "description": "Fuerza cu\u00e1driceps vasto externo (0-100)"
+    },
+    "strength_hamstrings": {
+      "type": "number",
+      "description": "Fuerza isquiotibiales (0-100)"
+    },
+    "injurious_movements": {
+      "type": "number",
+      "description": "Cantidad de movimientos lesivos registrados en la sesi\u00f3n"
+    },
     "knee_flexion_angle": {
       "type": "number",
       "description": "\u00c1ngulo de flexi\u00f3n de rodilla (grados)"
@@ -45,7 +63,5 @@
   },
   "required": [
     "session_id"
-  ],
-  "name": "SessionMetrics",
-  "type": "object"
+  ]
 }

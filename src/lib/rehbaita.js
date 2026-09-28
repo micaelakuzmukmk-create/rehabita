@@ -1,4 +1,4 @@
-// Utilidades compartidas de rehbaita
+// Utilidades compartidas de ReHabita
 
 // Determina el rol efectivo para la interfaz.
 // 1) Admin (modo demostración): usa la vista elegida temporalmente en localStorage.
@@ -37,6 +37,13 @@ export const METRICS = [
 ];
 
 export const METRIC_MAP = Object.fromEntries(METRICS.map(m => [m.key, m]));
+
+// Grupos musculares medidos en cada sesión.
+export const MUSCLE_GROUPS = [
+  { key: 'strength_vastus_medialis', label: 'Cuádriceps vasto interno', color: '#0d9488' },
+  { key: 'strength_vastus_lateralis', label: 'Cuádriceps vasto externo', color: '#2563eb' },
+  { key: 'strength_hamstrings', label: 'Isquiotibiales', color: '#7c3aed' },
+];
 
 // Genera un valor de progreso no lineal (mejoras, mesetas, descensos) para una sesión i de n.
 export function nonLinearProgress(start, end, i, n, noise = 0.04) {

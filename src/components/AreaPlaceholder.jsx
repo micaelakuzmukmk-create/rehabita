@@ -11,7 +11,7 @@ export default function AreaPlaceholder({ title, description, icon: Icon }) {
       <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
         <div className="text-sm font-medium text-slate-500">Sección en desarrollo</div>
         <p className="text-sm text-slate-500 mt-1">
-          Esta pantalla formará parte del área y estará disponible próximamente dentro de rehbaita.
+          Esta pantalla formará parte del área y estará disponible próximamente dentro de ReHabita.
         </p>
       </div>
     </div>

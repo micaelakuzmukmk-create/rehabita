@@ -1,4 +1,6 @@
 {
+  "name": "RehabPlan",
+  "type": "object",
   "properties": {
     "patient_id": {
       "type": "string"
@@ -19,6 +21,10 @@
     "target_end_date": {
       "type": "string",
       "format": "date"
+    },
+    "total_sessions": {
+      "type": "number",
+      "description": "Cantidad total de sesiones planificadas"
     },
     "goals": {
       "type": "string",
@@ -48,7 +54,5 @@
   "required": [
     "patient_id",
     "title"
-  ],
-  "name": "RehabPlan",
-  "type": "object"
+  ]
 }

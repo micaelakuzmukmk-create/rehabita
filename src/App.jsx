@@ -12,6 +12,7 @@ import SessionDetail from '@/pages/profesional/SessionDetail';
 import RehabPlanEdit from '@/pages/profesional/RehabPlanEdit';
 import PatientDashboard from '@/pages/paciente/Dashboard';
 import PatientSessionReport from '@/pages/paciente/SessionReport';
+import PatientProgress from '@/pages/paciente/Progress';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -60,7 +61,7 @@ const AuthenticatedApp = () => {
         <Route element={<Layout />}>
           {/* Área Paciente */}
           <Route path="/paciente" element={<PatientDashboard />} />
-          <Route path="/paciente/progreso" element={<AreaPlaceholder title="Mi progreso" description="Evolución detallada de tus indicadores de rehabilitación." icon={Construction} />} />
+          <Route path="/paciente/progreso" element={<PatientProgress />} />
           <Route path="/paciente/sesiones" element={<AreaPlaceholder title="Mis sesiones" description="Historial de tus sesiones de rehabilitación." icon={Construction} />} />
           <Route path="/paciente/comparar" element={<AreaPlaceholder title="Comparar sesiones" description="Compará tus métricas entre sesiones." icon={Construction} />} />
           <Route path="/paciente/plan" element={<AreaPlaceholder title="Plan de rehabilitación" description="Detalle de tu plan y etapa actual." icon={Construction} />} />
