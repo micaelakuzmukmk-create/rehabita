@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { ArrowLeftRight, LogOut, ChevronDown } from 'lucide-react';
+import { ArrowLeftRight, LogOut, ChevronDown, Repeat } from 'lucide-react';
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
@@ -55,6 +55,10 @@ export default function UserMenu() {
         <DropdownMenuItem onClick={switchRole} className="cursor-pointer">
           <ArrowLeftRight className="w-4 h-4 mr-2" />
           Cambiar vista
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/seleccionar-perfil', { replace: true })} className="cursor-pointer">
+          <Repeat className="w-4 h-4 mr-2" />
+          Cambiar perfil
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-rose-600 focus:text-rose-700">
           <LogOut className="w-4 h-4 mr-2" />
