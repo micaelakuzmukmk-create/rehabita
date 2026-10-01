@@ -17,6 +17,7 @@ import PatientSessions from '@/pages/paciente/Sessions';
 import PatientCompare from '@/pages/paciente/Compare';
 import PatientPlan from '@/pages/paciente/Plan';
 import PatientReports from '@/pages/paciente/Reports';
+import PatientProfile from '@/pages/paciente/Profile';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -70,7 +71,7 @@ const AuthenticatedApp = () => {
           <Route path="/paciente/comparar" element={<PatientCompare />} />
           <Route path="/paciente/plan" element={<PatientPlan />} />
           <Route path="/paciente/reportes" element={<PatientReports />} />
-          <Route path="/paciente/perfil" element={<AreaPlaceholder title="Perfil" description="Tus datos personales y de rehabilitación." icon={Construction} />} />
+          <Route path="/paciente/perfil" element={<PatientProfile />} />
           <Route path="/paciente/sesion/:sessionId" element={<PatientSessionReport />} />
           {/* Área Kinesiólogo */}
           <Route path="/kinesiologo/pacientes" element={<ProfessionalDashboard />} />
