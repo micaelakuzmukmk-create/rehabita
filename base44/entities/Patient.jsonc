@@ -46,6 +46,11 @@
       "type": "string",
       "description": "Tipo de operaci\u00f3n realizada"
     },
+    "surgery_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de la operaci\u00f3n"
+    },
     "rehab_start_date": {
       "type": "string",
       "format": "date",

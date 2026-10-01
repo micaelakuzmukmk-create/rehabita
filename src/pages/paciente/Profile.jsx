@@ -63,12 +63,18 @@ export default function Profile() {
 
   const initial = (patient.full_name || 'P').charAt(0).toUpperCase();
 
+  const fmtDate = (d) => (d ? format(parseISO(d), 'dd/MM/yyyy') : null);
+  const injurySide = patient.injury_side ? `rodilla ${patient.injury_side}` : null;
+
   const rows = [
     { label: 'Nombre y apellido', value: patient.full_name },
     { label: 'Edad', value: patient.birth_date ? `${differenceInYears(new Date(), parseISO(patient.birth_date))} años` : null },
     { label: 'Género', value: GENDER_LABELS[patient.gender] || patient.gender },
-    { label: 'Tipo de lesión', value: patient.injury_type },
+    { label: 'Tipo de lesión', value: [patient.injury_type, injurySide].filter(Boolean).join(' · ') },
+    { label: 'Fecha de la lesión', value: fmtDate(patient.injury_date) },
     { label: 'Tipo de operación', value: patient.surgery_type },
+    { label: 'Fecha de la operación', value: fmtDate(patient.surgery_date) },
+    { label: 'Fecha de hoy', value: fmtDate(new Date()) },
     { label: 'Tiempo de rehabilitación', value: elapsed(rehabStart) },
     { label: 'Tiempo desde la lesión', value: elapsed(patient.injury_date) },
     { label: 'Teléfono', value: patient.phone },
