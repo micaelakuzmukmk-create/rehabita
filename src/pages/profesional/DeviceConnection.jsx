@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { base44 } from '@/api/base44Client';
 import useBleDevice, {
   isWebBluetoothSupported,
   DEVICE_NAME,
@@ -8,24 +9,89 @@ import useBleDevice, {
 import ConnectionStatus, { ReceptionIndicator } from '@/components/device/ConnectionStatus';
 import LastMessageCard from '@/components/device/LastMessageCard';
 import MessageLog from '@/components/device/MessageLog';
+import SaveIndicator from '@/components/device/SaveIndicator';
+import MeasurementHistory from '@/components/device/MeasurementHistory';
 import { AlertTriangle, Bluetooth, BluetoothOff, MessageSquareDot, Smartphone } from 'lucide-react';
 
+const HISTORY_LIMIT = 50;
+
 export default function DeviceConnection() {
+  const [saveStatus, setSaveStatus] = useState('idle');
+  const [saveError, setSaveError] = useState(null);
+  const [savedCount, setSavedCount] = useState(0);
+  const [lastSavedAt, setLastSavedAt] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+
   const {
     status,
     error,
     deviceName,
+    sessionId,
     messages,
     receivedCount,
     lastReceivedAt,
     connect,
     disconnect,
     clearMessages,
-  } = useBleDevice();
+  } = useBleDevice({ onNotification: handleNotification });
+
+  // Persiste cada notificación nueva recibida mientras la conexión está activa.
+  async function handleNotification({ text, time }) {
+    if (status !== 'conectado' || !sessionId) return;
+
+    setSaveStatus('saving');
+    setSaveError(null);
+    try {
+      const record = await base44.entities.BluetoothMeasurement.create({
+        received_at: time.toISOString(),
+        device_name: deviceName || DEVICE_NAME,
+        message: text,
+        session_id: sessionId,
+        data_type: 'test_message',
+      });
+      setSavedCount((c) => c + 1);
+      setLastSavedAt(time);
+      setSaveStatus('saved');
+      setHistory((prev) => [record, ...prev].slice(0, HISTORY_LIMIT));
+    } catch (e) {
+      setSaveStatus('error');
+      setSaveError('No se pudo guardar el mensaje recibido.');
+    }
+  }
 
   const supported = isWebBluetoothSupported();
   const connected = status === 'conectado';
   const connecting = status === 'conectando';
+
+  // Al iniciar una nueva sesión de conexión se reinician los contadores.
+  useEffect(() => {
+    if (sessionId) {
+      setSavedCount(0);
+      setLastSavedAt(null);
+      setSaveStatus('idle');
+      setSaveError(null);
+    }
+  }, [sessionId]);
+
+  async function loadHistory() {
+    setHistoryLoading(true);
+    try {
+      const page = await base44.entities.BluetoothMeasurement.filter(
+        {},
+        { sort: '-received_at', limit: HISTORY_LIMIT }
+      );
+      setHistory(page.items);
+    } catch (e) {
+      setSaveError('No se pudo cargar el historial de registros.');
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadHistory();
+  }, []);
 
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
@@ -109,6 +175,15 @@ export default function DeviceConnection() {
 
         <LastMessageCard message={messages[0]} />
 
+        <SaveIndicator
+          status={saveStatus}
+          savedCount={savedCount}
+          lastSavedAt={lastSavedAt}
+          errorMessage={saveError}
+        />
+
+        <MeasurementHistory records={history} loading={historyLoading} onRefresh={loadHistory} />
+
         <MessageLog messages={messages} onClear={clearMessages} />
 
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -119,6 +194,7 @@ export default function DeviceConnection() {
             <div>Dispositivo: {DEVICE_NAME}</div>
             <div>Service UUID: {SERVICE_UUID}</div>
             <div>Characteristic UUID: {CHARACTERISTIC_UUID}</div>
+            <div>Sesión actual: {sessionId || '—'}</div>
           </dl>
         </div>
       </div>

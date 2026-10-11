@@ -42,8 +42,12 @@ function decodeValue(value) {
   return { text: clean, hex };
 }
 
-export default function useBleDevice() {
+const newSessionId = () =>
+  typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `sess-${Date.now()}`;
+
+export default function useBleDevice({ onNotification } = {}) {
   const [status, setStatus] = useState('desconectado');
+  const [sessionId, setSessionId] = useState(null);
   const [error, setError] = useState(null);
   const [deviceName, setDeviceName] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -52,22 +56,29 @@ export default function useBleDevice() {
 
   const deviceRef = useRef(null);
   const characteristicRef = useRef(null);
+  const onNotificationRef = useRef(onNotification);
+
+  useEffect(() => {
+    onNotificationRef.current = onNotification;
+  }, [onNotification]);
 
   const handleValue = useCallback((event) => {
     const { text, hex } = decodeValue(event.target.value);
+    const time = new Date();
     setMessages((prev) =>
       [
         {
           id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
           text,
           hex,
-          time: new Date(),
+          time,
         },
         ...prev,
       ].slice(0, MAX_MESSAGES)
     );
     setReceivedCount((c) => c + 1);
     setLastReceivedAt(Date.now());
+    onNotificationRef.current?.({ text, hex, time });
   }, []);
 
   const handleDisconnected = useCallback(() => {
@@ -75,6 +86,7 @@ export default function useBleDevice() {
     deviceRef.current = null;
     setStatus('desconectado');
     setDeviceName(null);
+    setSessionId(null);
     setError('El dispositivo se desconectó.');
   }, []);
 
@@ -119,6 +131,7 @@ export default function useBleDevice() {
 
     setError(null);
     setStatus('conectando');
+    setSessionId(newSessionId());
 
     try {
       const device = await navigator.bluetooth.requestDevice({
@@ -152,6 +165,7 @@ export default function useBleDevice() {
     await cleanup();
     setStatus('desconectado');
     setDeviceName(null);
+    setSessionId(null);
     setError(null);
     toast.success('Dispositivo desconectado');
   }, [cleanup]);
@@ -168,6 +182,7 @@ export default function useBleDevice() {
     status,
     error,
     deviceName,
+    sessionId,
     messages,
     receivedCount,
     lastReceivedAt,

@@ -1,0 +1,32 @@
+{
+  "name": "BluetoothMeasurement",
+  "type": "object",
+  "properties": {
+    "received_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora de recepci\u00f3n del mensaje BLE"
+    },
+    "device_name": {
+      "type": "string",
+      "description": "Nombre del dispositivo BLE que envi\u00f3 el mensaje"
+    },
+    "message": {
+      "type": "string",
+      "description": "Texto recibido por notificaci\u00f3n BLE"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Identificador de la sesi\u00f3n de conexi\u00f3n BLE"
+    },
+    "data_type": {
+      "type": "string",
+      "default": "test_message",
+      "description": "Tipo de dato almacenado"
+    }
+  },
+  "required": [
+    "received_at",
+    "message"
+  ]
+}
