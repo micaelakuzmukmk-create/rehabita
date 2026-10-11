@@ -42,12 +42,9 @@ function decodeValue(value) {
   return { text: clean, hex };
 }
 
-const newSessionId = () =>
-  typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `sess-${Date.now()}`;
-
+// Conexión BLE bidireccional con el wearable: NOTIFY para recibir y WRITE para enviar comandos.
 export default function useBleDevice({ onNotification } = {}) {
   const [status, setStatus] = useState('desconectado');
-  const [sessionId, setSessionId] = useState(null);
   const [error, setError] = useState(null);
   const [deviceName, setDeviceName] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -86,7 +83,6 @@ export default function useBleDevice({ onNotification } = {}) {
     deviceRef.current = null;
     setStatus('desconectado');
     setDeviceName(null);
-    setSessionId(null);
     setError('El dispositivo se desconectó.');
   }, []);
 
@@ -131,7 +127,6 @@ export default function useBleDevice({ onNotification } = {}) {
 
     setError(null);
     setStatus('conectando');
-    setSessionId(newSessionId());
 
     try {
       const device = await navigator.bluetooth.requestDevice({
@@ -151,8 +146,9 @@ export default function useBleDevice({ onNotification } = {}) {
       await characteristic.startNotifications();
       characteristic.addEventListener('characteristicvaluechanged', handleValue);
 
+      // El wearable no transmite hasta recibir el comando START.
       setStatus('conectado');
-      toast.success('Dispositivo conectado');
+      toast.success('Wearable conectado');
     } catch (e) {
       await cleanup();
       setStatus('desconectado');
@@ -165,10 +161,26 @@ export default function useBleDevice({ onNotification } = {}) {
     await cleanup();
     setStatus('desconectado');
     setDeviceName(null);
-    setSessionId(null);
     setError(null);
-    toast.success('Dispositivo desconectado');
+    toast.success('Wearable desvinculado');
   }, [cleanup]);
+
+  // Envía un comando de texto (START / STOP) a la característica BLE.
+  const sendCommand = useCallback(async (command) => {
+    const characteristic = characteristicRef.current;
+    if (!characteristic) throw new Error('No hay un wearable conectado.');
+
+    const data = new TextEncoder().encode(command);
+    if (typeof characteristic.writeValueWithoutResponse === 'function') {
+      try {
+        await characteristic.writeValueWithoutResponse(data);
+        return;
+      } catch (e) {
+        if (e?.name !== 'NotSupportedError') throw e;
+      }
+    }
+    await characteristic.writeValue(data);
+  }, []);
 
   const clearMessages = useCallback(() => {
     setMessages([]);
@@ -182,12 +194,12 @@ export default function useBleDevice({ onNotification } = {}) {
     status,
     error,
     deviceName,
-    sessionId,
     messages,
     receivedCount,
     lastReceivedAt,
     connect,
     disconnect,
+    sendCommand,
     clearMessages,
   };
 }

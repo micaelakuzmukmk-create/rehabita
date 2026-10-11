@@ -1,0 +1,51 @@
+{
+  "name": "MeasurementSession",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Paciente al que pertenece la medici\u00f3n"
+    },
+    "therapist_id": {
+      "type": "string",
+      "description": "Kinesi\u00f3logo responsable de la medici\u00f3n"
+    },
+    "device_name": {
+      "type": "string",
+      "description": "Nombre del wearable utilizado"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora de inicio de la medici\u00f3n"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora de finalizaci\u00f3n de la medici\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "activa",
+        "finalizada",
+        "interrumpida"
+      ],
+      "default": "activa",
+      "description": "Estado de la sesi\u00f3n de medici\u00f3n"
+    },
+    "sample_count": {
+      "type": "number",
+      "description": "Cantidad de muestras v\u00e1lidas almacenadas"
+    },
+    "simulated": {
+      "type": "boolean",
+      "default": true,
+      "description": "Indica si las se\u00f1ales provienen de datos simulados por el dispositivo"
+    }
+  },
+  "required": [
+    "patient_id",
+    "started_at"
+  ]
+}

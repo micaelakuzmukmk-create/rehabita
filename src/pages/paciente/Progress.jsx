@@ -4,7 +4,8 @@ import { base44 } from '@/api/base44Client';
 import ProgressRing from '@/components/paciente/ProgressRing';
 import MuscleStrengthChart from '@/components/paciente/MuscleStrengthChart';
 import InjuriousMovementsChart from '@/components/paciente/InjuriousMovementsChart';
-import { ArrowLeft, Dumbbell, AlertTriangle, CalendarCheck } from 'lucide-react';
+import MuscleActivitySummary from '@/components/paciente/MuscleActivitySummary';
+import { ArrowLeft, Activity, Dumbbell, AlertTriangle, CalendarCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const DEFAULT_TOTAL_SESSIONS = 24;
@@ -14,6 +15,8 @@ export default function PatientProgress() {
   const [sessions, setSessions] = useState([]);
   const [metrics, setMetrics] = useState([]);
   const [plan, setPlan] = useState(null);
+  const [measurementSessions, setMeasurementSessions] = useState([]);
+  const [measurementSummaries, setMeasurementSummaries] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { load(); }, []);
@@ -35,6 +38,13 @@ export default function PatientProgress() {
       setSessions(s);
       setMetrics(m);
       setPlan(pl[0] || null);
+
+      const [ms, ss] = await Promise.all([
+        base44.entities.MeasurementSession.filter({ patient_id: p.id }, '-started_at', 100),
+        base44.entities.SessionSummary.filter({ patient_id: p.id }, '-created_date', 200),
+      ]);
+      setMeasurementSessions(ms.filter(x => x.status !== 'activa'));
+      setMeasurementSummaries(Object.fromEntries(ss.map(x => [x.session_id, x])));
     } catch (e) {
       toast.error('No se pudo cargar tu progreso');
     } finally {
@@ -109,6 +119,17 @@ export default function PatientProgress() {
         </div>
         <p className="text-sm text-slate-500 mt-1 mb-3">Cantidad de movimientos lesivos registrados en cada sesión.</p>
         <InjuriousMovementsChart data={chartData} />
+      </div>
+
+      {/* Actividad muscular registrada con el wearable */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <div className="flex items-center gap-2 font-semibold text-slate-800">
+          <Activity className="w-4 h-4 text-violet-600" /> Actividad muscular registrada
+        </div>
+        <p className="text-sm text-slate-500 mt-1 mb-3">
+          Índices máximos de actividad de cada grupo muscular en tus mediciones con el wearable.
+        </p>
+        <MuscleActivitySummary sessions={measurementSessions} summaries={measurementSummaries} />
       </div>
     </div>
   );

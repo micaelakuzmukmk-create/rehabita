@@ -11,6 +11,7 @@ import SessionCreate from '@/pages/profesional/SessionCreate';
 import SessionDetail from '@/pages/profesional/SessionDetail';
 import RehabPlanEdit from '@/pages/profesional/RehabPlanEdit';
 import DeviceConnection from '@/pages/profesional/DeviceConnection';
+import Seguimiento from '@/pages/profesional/Seguimiento';
 import PatientDashboard from '@/pages/paciente/Dashboard';
 import PatientSessionReport from '@/pages/paciente/SessionReport';
 import PatientProgress from '@/pages/paciente/Progress';
@@ -81,7 +82,7 @@ const AuthenticatedApp = () => {
           <Route path="/kinesiologo/paciente/:patientId/plan" element={<RehabPlanEdit />} />
           <Route path="/kinesiologo/sesion/nueva" element={<AreaPlaceholder title="Nueva sesión" description="Seleccioná un paciente desde el listado de Pacientes para iniciar una nueva sesión." icon={Construction} />} />
           <Route path="/kinesiologo/sesiones" element={<AreaPlaceholder title="Sesiones" description="Listado general de sesiones del profesional." icon={Construction} />} />
-          <Route path="/kinesiologo/seguimiento" element={<AreaPlaceholder title="Seguimiento" description="Seguimiento global de pacientes y planes activos." icon={Construction} />} />
+          <Route path="/kinesiologo/seguimiento" element={<Seguimiento />} />
           <Route path="/kinesiologo/dispositivo" element={<DeviceConnection />} />
           <Route path="/kinesiologo/perfil" element={<AreaPlaceholder title="Perfil" description="Datos del profesional a cargo." icon={Construction} />} />
           <Route path="/kinesiologo/sesion/:sessionId" element={<SessionDetail />} />
