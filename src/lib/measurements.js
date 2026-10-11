@@ -31,12 +31,14 @@ export function parseSample(text) {
   try {
     const obj = JSON.parse(text);
     if (!obj || typeof obj !== 'object') return null;
+    // Solo se procesan mensajes válidos de tipo "emg".
+    if (obj.type !== 'emg') return null;
     const isquio = clampIndex(obj.isquio);
     const vasto_interno = clampIndex(obj.vasto_interno);
     const vasto_externo = clampIndex(obj.vasto_externo);
     if (isquio == null && vasto_interno == null && vasto_externo == null) return null;
     return {
-      type: obj.type || 'emg',
+      type: 'emg',
       simulated: obj.simulated !== false,
       isquio,
       vasto_interno,

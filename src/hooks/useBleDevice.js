@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { parseSample } from '@/lib/measurements';
 
 export const DEVICE_NAME = 'Rodilla_ESP32';
 export const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
@@ -38,7 +39,8 @@ function decodeValue(value) {
   } catch {
     text = '';
   }
-  const clean = text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').trim();
+  // No se recorta el texto: el salto de línea "\n" cierra cada mensaje JSON.
+  const clean = text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
   return { text: clean, hex };
 }
 
@@ -53,40 +55,58 @@ export default function useBleDevice({ onNotification } = {}) {
 
   const deviceRef = useRef(null);
   const characteristicRef = useRef(null);
+  const bufferRef = useRef('');
   const onNotificationRef = useRef(onNotification);
 
   useEffect(() => {
     onNotificationRef.current = onNotification;
   }, [onNotification]);
 
+  // La ESP32 fragmenta cada JSON en bloques de hasta 20 bytes y lo cierra con "\n".
   const handleValue = useCallback((event) => {
     const { text, hex } = decodeValue(event.target.value);
     const time = new Date();
+
+    bufferRef.current += text;
+    // Fragmento incompleto: se acumula sin interpretarlo como error.
+    if (!bufferRef.current.includes('\n')) return;
+
+    const parts = bufferRef.current.split('\n');
+    bufferRef.current = parts.pop() ?? '';
+
+    const complete = parts.map((p) => p.trim()).filter(Boolean);
+    if (complete.length === 0) return;
+
     setMessages((prev) =>
       [
-        {
-          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-          text,
+        ...complete.map((line, i) => ({
+          id: `${Date.now()}-${i}-${Math.random().toString(16).slice(2)}`,
+          text: line,
           hex,
           time,
-        },
+        })),
         ...prev,
       ].slice(0, MAX_MESSAGES)
     );
-    setReceivedCount((c) => c + 1);
+    setReceivedCount((c) => c + complete.length);
     setLastReceivedAt(Date.now());
-    onNotificationRef.current?.({ text, hex, time });
+
+    complete.forEach((line) => {
+      onNotificationRef.current?.({ text: line, hex, time, sample: parseSample(line) });
+    });
   }, []);
 
   const handleDisconnected = useCallback(() => {
     characteristicRef.current = null;
     deviceRef.current = null;
+    bufferRef.current = '';
     setStatus('desconectado');
     setDeviceName(null);
     setError('El dispositivo se desconectó.');
   }, []);
 
   const cleanup = useCallback(async () => {
+    bufferRef.current = '';
     const characteristic = characteristicRef.current;
     if (characteristic) {
       try {
@@ -127,6 +147,7 @@ export default function useBleDevice({ onNotification } = {}) {
 
     setError(null);
     setStatus('conectando');
+    bufferRef.current = '';
 
     try {
       const device = await navigator.bluetooth.requestDevice({

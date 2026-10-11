@@ -10,7 +10,7 @@ import ConnectionStatus from '@/components/device/ConnectionStatus';
 import PatientSelector from '@/components/profesional/PatientSelector';
 import DeviceStatePanel from '@/components/profesional/DeviceStatePanel';
 import { loadTherapistPatients } from '@/lib/therapist';
-import { parseSample, summarizeSamples, SAMPLE_STALE_MS } from '@/lib/measurements';
+import { summarizeSamples, SAMPLE_STALE_MS } from '@/lib/measurements';
 import { AlertTriangle, Bluetooth, Play, Smartphone, Square, Unlink } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -44,11 +44,10 @@ export default function DeviceConnection() {
   } = useBleDevice({ onNotification: handleNotification });
 
   // Asocia cada muestra recibida a la sesión y al paciente activos.
-  function handleNotification({ text, time }) {
+  function handleNotification({ text, time, sample }) {
     const session = sessionRef.current;
-    if (!session || session.status !== 'activa') return;
+    if (!session || session.status !== 'activa' || !session.patient_id) return;
 
-    const sample = parseSample(text);
     if (!sample) {
       // Mensajes que no son muestras (confirmaciones del wearable) quedan como registro crudo.
       base44.entities.BluetoothMeasurement.create({
