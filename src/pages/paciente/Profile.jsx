@@ -46,7 +46,7 @@ export default function Profile() {
   if (!patient) return <div className="text-sm text-slate-400">No tenés un paciente vinculado.</div>;
 
   const initial = (patient.full_name || 'P').charAt(0).toUpperCase();
-  const fmtDate = (d) => (d ? format(parseISO(d), 'dd/MM/yyyy') : null);
+  const fmtDate = (d) => (d ? format(d instanceof Date ? d : parseISO(d), 'dd/MM/yyyy') : null);
   const knee = patient.injury_side
     ? patient.injury_side.charAt(0).toUpperCase() + patient.injury_side.slice(1)
     : null;
