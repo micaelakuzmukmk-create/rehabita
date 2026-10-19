@@ -3,6 +3,8 @@ import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { Activity } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import UserMenu from '@/components/UserMenu';
+import NavBadge from '@/components/NavBadge';
+import { usePatientBadges } from '@/hooks/usePatientBadges';
 import { PACIENTE_NAV, PROFESIONAL_NAV, AREA_LABELS } from '@/lib/navigation';
 
 export default function Layout() {
@@ -10,6 +12,7 @@ export default function Layout() {
   const isKinesiologo = location.pathname.startsWith('/kinesiologo');
   const nav = isKinesiologo ? PROFESIONAL_NAV : PACIENTE_NAV;
   const areaLabel = AREA_LABELS[isKinesiologo ? 'professional' : 'patient'];
+  const counts = usePatientBadges(!isKinesiologo);
 
   const renderNavItems = (itemClass, iconClass) =>
     nav.map((item) => {
@@ -25,6 +28,7 @@ export default function Layout() {
         >
           <Icon className={iconClass} />
           {item.label}
+          {item.badgeKey && <NavBadge count={counts[item.badgeKey]} />}
         </NavLink>
       );
     });

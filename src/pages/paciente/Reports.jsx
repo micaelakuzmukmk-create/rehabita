@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
+import { refreshBadges } from '@/hooks/usePatientBadges';
 
 export default function Reports() {
   const [patient, setPatient] = useState(null);
@@ -29,6 +30,13 @@ export default function Reports() {
       ]);
       setSessions(ss);
       setComments(cm);
+
+      // Al abrir los reportes quedan vistos: se apaga la notificación.
+      const unseen = cm.filter(c => !p.reports_seen_at || new Date(c.date) > new Date(p.reports_seen_at));
+      if (unseen.length > 0) {
+        await base44.entities.Patient.update(p.id, { reports_seen_at: new Date().toISOString() });
+        refreshBadges();
+      }
     } catch (e) {
       toast.error('No se pudieron cargar tus reportes');
     } finally {

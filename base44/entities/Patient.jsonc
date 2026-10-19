@@ -1,4 +1,6 @@
 {
+  "name": "Patient",
+  "type": "object",
   "properties": {
     "full_name": {
       "type": "string",
@@ -78,12 +80,15 @@
         "alta"
       ],
       "default": "activo"
+    },
+    "reports_seen_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u00daltima vez que el paciente abri\u00f3 la secci\u00f3n Reportes"
     }
   },
   "required": [
     "full_name",
     "injury_side"
-  ],
-  "name": "Patient",
-  "type": "object"
+  ]
 }

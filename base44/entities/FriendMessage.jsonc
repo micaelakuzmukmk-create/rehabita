@@ -1,0 +1,32 @@
+{
+  "name": "FriendMessage",
+  "type": "object",
+  "properties": {
+    "friendship_id": {
+      "type": "string",
+      "description": "Conexi\u00f3n (amistad) a la que pertenece el mensaje"
+    },
+    "sender_patient_id": {
+      "type": "string",
+      "description": "Paciente que escribi\u00f3 el mensaje"
+    },
+    "recipient_patient_id": {
+      "type": "string",
+      "description": "Paciente que recibe el mensaje"
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenido del mensaje"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica si el destinatario ya ley\u00f3 el mensaje"
+    }
+  },
+  "required": [
+    "sender_patient_id",
+    "recipient_patient_id",
+    "content"
+  ]
+}

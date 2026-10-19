@@ -10,6 +10,7 @@ import {
   CalendarPlus,
   Activity,
   Cpu,
+  HeartHandshake,
 } from 'lucide-react';
 
 // Navegación separada por área. No se mezclan opciones entre perfiles.
@@ -21,7 +22,8 @@ export const PACIENTE_NAV = [
   { to: '/paciente/sesiones', label: 'Mis sesiones', icon: CalendarDays },
   { to: '/paciente/comparar', label: 'Comparar sesiones', icon: GitCompare },
   { to: '/paciente/plan', label: 'Plan de rehabilitación', icon: ClipboardList },
-  { to: '/paciente/reportes', label: 'Reportes', icon: FileText },
+  { to: '/paciente/reportes', label: 'Reportes', icon: FileText, badgeKey: 'reportes' },
+  { to: '/paciente/amigos', label: 'Amigos', icon: HeartHandshake, badgeKey: 'amigos' },
   { to: '/paciente/perfil', label: 'Perfil', icon: User },
 ];
 
