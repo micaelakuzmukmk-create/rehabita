@@ -26,7 +26,7 @@ export default function StatTile({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-card sm:p-5',
+        'relative overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-surface sm:p-5',
         className
       )}
     >

@@ -32,7 +32,7 @@ export default function SelectProfile() {
         <div className="mt-9 grid w-full max-w-3xl gap-4 sm:grid-cols-2">
           <button
             onClick={() => choose('patient')}
-            className="group flex flex-col rounded-3xl border border-border bg-card p-6 text-left shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-lavender sm:p-7"
+            className="group flex flex-col rounded-3xl border border-border bg-card p-6 text-left shadow-surface transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-lavender sm:p-7"
           >
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-primary">
               <User className="h-6 w-6" />
@@ -50,7 +50,7 @@ export default function SelectProfile() {
 
           <button
             onClick={() => choose('professional')}
-            className="group flex flex-col rounded-3xl border border-border bg-card p-6 text-left shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-lavender sm:p-7"
+            className="group flex flex-col rounded-3xl border border-border bg-card p-6 text-left shadow-surface transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-lavender sm:p-7"
           >
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
               <Stethoscope className="h-6 w-6" />

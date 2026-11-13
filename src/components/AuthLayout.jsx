@@ -15,7 +15,7 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
           {subtitle && <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{subtitle}</p>}
         </div>
 
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8">
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-surface sm:p-8">
           {children}
         </div>
 

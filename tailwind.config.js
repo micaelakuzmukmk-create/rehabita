@@ -9,12 +9,12 @@ module.exports = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)',
-  			xl: 'calc(var(--radius) + 2px)',
-  			'2xl': 'calc(var(--radius) + 6px)',
+  			xl: 'calc(var(--radius) - 4px)',
+  			'2xl': 'calc(var(--radius) + 4px)',
   			'3xl': 'calc(var(--radius) + 14px)'
   		},
   		boxShadow: {
-  			card: '0 1px 2px rgba(30, 20, 70, 0.04), 0 10px 30px -24px rgba(30, 20, 70, 0.28)',
+  			surface: '0 1px 2px rgba(30, 20, 70, 0.04), 0 10px 30px -24px rgba(30, 20, 70, 0.28)',
   			soft: '0 1px 2px rgba(30, 20, 70, 0.03)'
   		},
   		colors: {

@@ -44,7 +44,7 @@ export default function UserMenu() {
           <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60 rounded-2xl border-border p-1.5 shadow-card">
+      <DropdownMenuContent align="end" className="w-60 rounded-2xl border-border p-1.5 shadow-surface">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col px-1.5 py-1">
             <span className="truncate text-sm font-medium text-foreground">{user?.full_name || user?.email || 'Usuario'}</span>

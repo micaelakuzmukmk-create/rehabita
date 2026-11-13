@@ -81,7 +81,7 @@ export default function ProfessionalDashboard() {
       ) : filtered.length === 0 ? (
         <EmptyState title="No hay pacientes" description="No encontramos pacientes con ese nombre." />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-surface">
           <div className="hidden items-center gap-4 border-b border-border px-5 py-2.5 md:flex">
             <span className="eyebrow flex-1">Paciente</span>
             <span className="eyebrow w-40">Etapa</span>
