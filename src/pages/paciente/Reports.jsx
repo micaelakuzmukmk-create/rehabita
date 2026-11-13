@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/ds/PageHeader';
 import Card from '@/components/ds/Card';
-import Chip from '@/components/ds/Chip';
 import LoadingState from '@/components/ds/LoadingState';
 import EmptyState from '@/components/ds/EmptyState';
 import { MessageSquare, ArrowUpRight, FileText } from 'lucide-react';

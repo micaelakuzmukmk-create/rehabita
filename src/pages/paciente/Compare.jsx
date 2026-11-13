@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/ds/PageHeader';
-import SectionCard from '@/components/ds/SectionCard';
 import Card from '@/components/ds/Card';
 import Chip from '@/components/ds/Chip';
 import LoadingState from '@/components/ds/LoadingState';

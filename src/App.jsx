@@ -25,6 +25,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import Mfa from '@/pages/Mfa';
 import PageNotFound from './lib/PageNotFound';
 import AreaPlaceholder from '@/components/AreaPlaceholder';
 import { Construction } from 'lucide-react';
@@ -63,6 +64,7 @@ const AuthenticatedApp = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/mfa" element={<Mfa />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/" element={<Navigate to="/seleccionar-perfil" replace />} />
         <Route path="/seleccionar-perfil" element={<SelectProfile />} />

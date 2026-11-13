@@ -36,7 +36,7 @@ export default function Layout() {
           to={item.to}
           end={item.end}
           className={({ isActive }) =>
-            `group relative flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] transition-colors ${
+            `group relative flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-xl px-3 py-2.5 text-[13px] transition-colors ${
               isActive
                 ? 'bg-brand-soft font-medium text-primary'
                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -62,10 +62,10 @@ export default function Layout() {
       <Toaster position="top-right" />
 
       {/* Sidebar desktop */}
-      <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-[232px] md:flex-col border-r border-border bg-card">
-        <div className="px-5 pb-5 pt-6">
+      <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-[218px] md:flex-col border-r border-border bg-card">
+        <div className="px-4 pb-5 pt-6">
           <Link to="/seleccionar-perfil" className="block" aria-label="ReHabita">
-            <img src="/brand/rehabita-logo-horizontal.png" alt="ReHabita" className="h-9 w-auto" />
+            <img src="/brand/rehabita-logo-horizontal.png" alt="ReHabita" className="h-10 w-auto max-w-full" />
           </Link>
           <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
             <span className="h-1.5 w-1.5 rounded-full bg-brand-cyan" />
@@ -75,7 +75,7 @@ export default function Layout() {
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">{renderNavItems()}</nav>
 
-        <div className="border-t border-border px-5 py-4">
+        <div className="border-t border-border px-4 py-4">
           <p className="text-[10px] leading-relaxed text-muted-foreground">
             El dispositivo registra · la plataforma traduce · vos interpretás.
           </p>
@@ -83,7 +83,7 @@ export default function Layout() {
       </aside>
 
       {/* Columna principal */}
-      <div className="flex min-h-screen flex-col md:pl-[232px]">
+      <div className="flex min-h-screen flex-col md:pl-[218px]">
         <header className="sticky top-0 z-30 border-b border-border bg-card">
           <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center gap-3">
@@ -98,10 +98,6 @@ export default function Layout() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="hidden rounded-full border border-border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground lg:inline-flex">
-                {areaLabel}
-              </span>
-              <span className="hidden h-6 w-px bg-border lg:block" />
               <UserMenu />
             </div>
           </div>
@@ -113,7 +109,9 @@ export default function Layout() {
         </header>
 
         <main className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-          <Outlet />
+          <div key={location.pathname} className="animate-fade-rise">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
