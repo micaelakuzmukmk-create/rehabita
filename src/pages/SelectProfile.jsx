@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setDemoRole } from '@/lib/rehbaita';
-import { Activity, User, Stethoscope, ArrowRight } from 'lucide-react';
+import { User, Stethoscope, ArrowRight } from 'lucide-react';
 
 export default function SelectProfile() {
   const navigate = useNavigate();
@@ -12,60 +12,65 @@ export default function SelectProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        {/* Marca */}
-        <div className="flex items-center gap-2 mb-10">
-          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center">
-            <Activity className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-xl font-semibold tracking-tight text-slate-900">ReHabita</span>
-        </div>
-
-        <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 text-center">Seleccioná un perfil</h1>
-
-        {/* Tarjetas */}
-        <div className="grid sm:grid-cols-2 gap-5 mt-8 w-full max-w-3xl">
-          {/* Paciente */}
-          <button
-            onClick={() => choose('patient')}
-            className="group flex flex-col text-left rounded-2xl border border-slate-200 bg-white p-7 hover:border-teal-500 hover:shadow-sm transition"
-          >
-            <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center mb-5">
-              <User className="w-6 h-6 text-teal-600" />
-            </div>
-            <div className="text-lg font-semibold text-slate-900">Paciente</div>
-            <div className="text-sm text-teal-700 font-medium mt-0.5">Seguimiento de mi rehabilitación</div>
-            <p className="text-sm text-slate-500 mt-2 flex-1">Consultá tu progreso, sesiones y evolución</p>
-            <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-teal-700">
-              Ingresar como paciente
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
-            </span>
-          </button>
-
-          {/* Kinesiólogo */}
-          <button
-            onClick={() => choose('professional')}
-            className="group flex flex-col text-left rounded-2xl border border-slate-200 bg-white p-7 hover:border-slate-900 hover:shadow-sm transition"
-          >
-            <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center mb-5">
-              <Stethoscope className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-lg font-semibold text-slate-900">Kinesiólogo</div>
-            <div className="text-sm text-slate-500 font-medium mt-0.5">Gestión y seguimiento de pacientes</div>
-            <p className="text-sm text-slate-500 mt-2 flex-1">Gestioná pacientes, sesiones y mediciones</p>
-            <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-slate-900">
-              Ingresar como kinesiólogo
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
-            </span>
-          </button>
-        </div>
-
-        {/* Leyenda */}
-        <p className="text-sm text-slate-400 mt-8">Seleccioná cómo querés ingresar a ReHabita</p>
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-background">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-brand-soft blur-3xl" />
+        <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-brand-mist blur-3xl" />
       </div>
 
-      <footer className="text-center text-xs text-slate-400 pb-6">
+      <div className="relative flex flex-1 flex-col items-center justify-center px-4 py-12">
+        <img src="/brand/rehabita-logo-horizontal.png" alt="ReHabita" className="h-11 w-auto" />
+
+        <p className="mt-8 eyebrow">Acceso al sistema</p>
+        <h1 className="mt-2 text-center font-heading text-[26px] font-semibold tracking-tight text-foreground sm:text-[32px]">
+          Seleccioná un perfil
+        </h1>
+        <p className="mt-2 max-w-md text-center text-sm leading-relaxed text-muted-foreground">
+          La misma información clínica, dos formas de recorrerla: análisis para el profesional, comprensión para el paciente.
+        </p>
+
+        <div className="mt-9 grid w-full max-w-3xl gap-4 sm:grid-cols-2">
+          <button
+            onClick={() => choose('patient')}
+            className="group flex flex-col rounded-3xl border border-border bg-card p-6 text-left shadow-surface transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-lavender sm:p-7"
+          >
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-primary">
+              <User className="h-6 w-6" />
+            </div>
+            <div className="font-heading text-lg font-semibold tracking-tight text-foreground">Paciente</div>
+            <div className="mt-1 text-[13px] font-medium text-primary">Seguimiento de mi rehabilitación</div>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+              Consultá tu progreso, sesiones y la devolución de tu kinesiólogo.
+            </p>
+            <span className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-primary">
+              Ingresar como paciente
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </button>
+
+          <button
+            onClick={() => choose('professional')}
+            className="group flex flex-col rounded-3xl border border-border bg-card p-6 text-left shadow-surface transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-lavender sm:p-7"
+          >
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+              <Stethoscope className="h-6 w-6" />
+            </div>
+            <div className="font-heading text-lg font-semibold tracking-tight text-foreground">Kinesiólogo</div>
+            <div className="mt-1 text-[13px] font-medium text-primary">Gestión y seguimiento de pacientes</div>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+              Gestioná pacientes, sesiones, mediciones y planes de rehabilitación.
+            </p>
+            <span className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-primary">
+              Ingresar como kinesiólogo
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </button>
+        </div>
+
+        <p className="mt-8 text-[13px] text-muted-foreground">Seleccioná cómo querés ingresar a ReHabita</p>
+      </div>
+
+      <footer className="relative pb-6 text-center text-[11px] text-muted-foreground">
         Modo demostración · podés cambiar de perfil en cualquier momento desde tu menú de usuario
       </footer>
     </div>

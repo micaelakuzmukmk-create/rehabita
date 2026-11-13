@@ -13,6 +13,11 @@ import { loadTherapistPatients } from '@/lib/therapist';
 import { summarizeSamples, SAMPLE_STALE_MS } from '@/lib/measurements';
 import { AlertTriangle, Bluetooth, Play, Smartphone, Square, Unlink } from 'lucide-react';
 import toast from 'react-hot-toast';
+import PageHeader from '@/components/ds/PageHeader';
+import Card from '@/components/ds/Card';
+import Chip from '@/components/ds/Chip';
+import LoadingState from '@/components/ds/LoadingState';
+import { Button } from '@/components/ui/button';
 
 const FLUSH_MS = 3000;
 const MAX_BATCH = 500;
@@ -261,29 +266,27 @@ export default function DeviceConnection() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando…</div>;
+  if (loading) return <LoadingState label="Cargando dispositivo…" />;
 
   const supported = isWebBluetoothSupported();
   const patientName = patients.find((p) => p.id === patientId)?.full_name;
 
   return (
-    <div className="max-w-3xl">
-      <div className="flex items-center justify-between gap-3 mb-1">
-        <div className="flex items-center gap-2">
-          <Bluetooth className="w-5 h-5 text-slate-500" />
-          <h1 className="text-xl font-semibold text-slate-900">Dispositivo</h1>
-        </div>
-        <span className="text-[11px] px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-          Datos simulados
-        </span>
-      </div>
-      <p className="text-sm text-slate-500">
-        Vinculá el wearable <span className="font-medium text-slate-700">{DEVICE_NAME}</span> por Bluetooth Low Energy
-        (BLE) desde Google Chrome en Android, seleccioná el paciente e iniciá la medición.
-      </p>
+    <div className="max-w-3xl space-y-5">
+      <PageHeader
+        eyebrow="Área Kinesiólogo"
+        title="Dispositivo"
+        subtitle={
+          <span>
+            Vinculá el wearable <span className="font-medium text-foreground">{DEVICE_NAME}</span> por Bluetooth Low Energy
+            (BLE) desde Google Chrome en Android, seleccioná el paciente e iniciá la medición.
+          </span>
+        }
+        actions={<Chip tone="warning" dot>Datos simulados</Chip>}
+      />
 
       {!supported && (
-        <div className="mt-4 flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <div className="flex gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4">
           <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-sm text-amber-800">
             <div className="font-medium">Este navegador no admite Web Bluetooth</div>
@@ -295,7 +298,7 @@ export default function DeviceConnection() {
         </div>
       )}
 
-      <div className="mt-5 space-y-4">
+      <div className="space-y-4">
         <ConnectionStatus status={status} deviceName={deviceName} />
 
         <DeviceStatePanel
@@ -316,50 +319,52 @@ export default function DeviceConnection() {
           hint="No se puede cambiar de paciente mientras hay una medición en curso."
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <button
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <Button
             onClick={connect}
             disabled={!supported || connecting || connected || busy}
-            className="inline-flex items-center justify-center gap-2 text-sm px-4 py-2.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-40"
+            className="h-11"
           >
             {connecting ? (
-              <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
             ) : (
-              <Bluetooth className="w-4 h-4" />
+              <Bluetooth className="h-4 w-4" />
             )}
             Conectar wearable
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={startMeasurement}
             disabled={!connected || !patientId || sessionActive || busy}
-            className="inline-flex items-center justify-center gap-2 text-sm px-4 py-2.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-40"
+            className="h-11 bg-brand-cyan text-primary hover:opacity-90"
           >
-            <Play className="w-4 h-4" /> Iniciar medición
-          </button>
+            <Play className="h-4 w-4" /> Iniciar medición
+          </Button>
 
-          <button
+          <Button
             onClick={finishMeasurement}
             disabled={!sessionActive || busy}
-            className="inline-flex items-center justify-center gap-2 text-sm px-4 py-2.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-40"
+            variant="secondary"
+            className="h-11"
           >
-            <Square className="w-4 h-4" /> Finalizar medición
-          </button>
+            <Square className="h-4 w-4" /> Finalizar medición
+          </Button>
 
-          <button
+          <Button
             onClick={handleUnbind}
             disabled={(!connected && !sessionActive) || busy}
-            className="inline-flex items-center justify-center gap-2 text-sm px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+            variant="outline"
+            className="h-11"
           >
-            <Unlink className="w-4 h-4" /> Desvincular
-          </button>
+            <Unlink className="h-4 w-4" /> Desvincular
+          </Button>
         </div>
 
         {!connected && patientId && !sessionActive && (
-          <p className="text-xs text-slate-500">Conectá el wearable para habilitar el inicio de la medición.</p>
+          <p className="text-[11px] text-muted-foreground">Conectá el wearable para habilitar el inicio de la medición.</p>
         )}
         {connected && !patientId && (
-          <p className="text-xs text-slate-500">Seleccioná un paciente para habilitar el inicio de la medición.</p>
+          <p className="text-[11px] text-muted-foreground">Seleccioná un paciente para habilitar el inicio de la medición.</p>
         )}
 
         {error && (
@@ -376,17 +381,18 @@ export default function DeviceConnection() {
           </div>
         )}
 
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600 mb-2">
-            <Smartphone className="w-3.5 h-3.5" /> Parámetros de conexión
+        <Card className="p-4 sm:p-5">
+          <div className="mb-2 flex items-center gap-1.5">
+            <Smartphone className="h-3.5 w-3.5 text-primary" />
+            <span className="eyebrow">Parámetros de conexión</span>
           </div>
-          <dl className="space-y-1 text-[11px] font-mono text-slate-500 break-all">
+          <dl className="space-y-1 break-all font-mono text-[11px] text-muted-foreground">
             <div>Dispositivo: {DEVICE_NAME}</div>
             <div>Service UUID: {SERVICE_UUID}</div>
             <div>Characteristic UUID: {CHARACTERISTIC_UUID}</div>
             <div>Comandos: START / STOP</div>
           </dl>
-        </div>
+        </Card>
       </div>
     </div>
   );

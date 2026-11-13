@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Square, Radio } from 'lucide-react';
+import { Square } from 'lucide-react';
 import { METRIC_MAP } from '@/lib/rehbaita';
+import { Button } from '@/components/ui/button';
 
 const LIVE = ['symmetry', 'load_distribution', 'stability', 'knee_flexion_angle'];
 
@@ -31,20 +32,24 @@ export default function LiveMeasureStep({ calibration, exerciseNames, onFinal, o
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-emerald-700">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Medición en tiempo real
+        <div className="flex items-center gap-2 text-[13px] font-medium text-primary">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-cyan opacity-70" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-cyan" />
+          </span>
+          Medición en tiempo real
         </div>
-        <div className="text-sm font-mono text-slate-600 tabular-nums">{fmt(secs)}</div>
+        <div className="font-mono text-sm text-muted-foreground tabular-nums">{fmt(secs)}</div>
       </div>
-      <div className="text-xs text-slate-500">Ejercicios: {exerciseNames.join(', ') || '—'}</div>
-      <div className="grid sm:grid-cols-2 gap-3">
+      <div className="text-[11px] text-muted-foreground">Ejercicios: {exerciseNames.join(', ') || '—'}</div>
+      <div className="grid gap-2.5 sm:grid-cols-2">
         {LIVE.map(k => <LiveCard key={k} k={k} value={vals[k]} />)}
       </div>
-      <div className="flex justify-between items-center pt-1">
-        <button onClick={onBack} className="text-sm text-slate-500 hover:text-slate-900">Atrás</button>
-        <button onClick={() => onFinal(ref.current, secs)} className="text-sm px-5 py-2.5 rounded-lg bg-slate-900 text-white inline-flex items-center gap-1.5">
-          <Square className="w-4 h-4" /> Finalizar medición
-        </button>
+      <div className="flex items-center justify-between gap-3 pt-1">
+        <Button variant="ghost" size="sm" onClick={onBack}>Atrás</Button>
+        <Button onClick={() => onFinal(ref.current, secs)}>
+          <Square className="h-4 w-4" /> Finalizar medición
+        </Button>
       </div>
     </div>
   );
@@ -54,17 +59,20 @@ function LiveCard({ k, value }) {
   const m = METRIC_MAP[k];
   const pct = Math.min(100, (value / m.max) * 100);
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-slate-500">{m.label}</span>
-        <Radio className="w-3.5 h-3.5 text-emerald-500" />
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="flex items-center justify-between gap-2">
+        <span className="micro-label">{m.label}</span>
+        <span className="h-1.5 w-1.5 rounded-full bg-brand-cyan" />
       </div>
-      <div className="mt-1 flex items-baseline gap-1">
-        <span className="text-3xl font-semibold text-slate-900 tabular-nums">{Math.round(value * 10) / 10}</span>
-        {m.unit && <span className="text-sm text-slate-400">{m.unit}</span>}
+      <div className="mt-2 flex items-baseline gap-1">
+        <span className="metric-value">{Math.round(value * 10) / 10}</span>
+        {m.unit && <span className="metric-unit">{m.unit}</span>}
       </div>
-      <div className="mt-3 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: m.color }} />
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
+        <div
+          className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{ width: `${pct}%`, background: m.color }}
+        />
       </div>
     </div>
   );

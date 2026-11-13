@@ -15,8 +15,8 @@ export default function PhaseStep({ phase, setPhase, plan, onBack, onNext }) {
   return (
     <div className="space-y-4">
       <div>
-        <div className="text-sm text-slate-700">Seleccioná la etapa de rehabilitación de esta sesión</div>
-        {current && <div className="text-xs text-slate-500 mt-1">Etapa actual del plan: <span className="font-medium text-slate-700">{current}</span></div>}
+        <div className="text-sm text-foreground">Seleccioná la etapa de rehabilitación de esta sesión</div>
+        {current && <div className="mt-1 text-[11px] text-muted-foreground">Etapa actual del plan: <span className="font-medium text-primary">{current}</span></div>}
       </div>
       <div className="space-y-2">
         {PHASES.map(p => {
@@ -25,13 +25,19 @@ export default function PhaseStep({ phase, setPhase, plan, onBack, onNext }) {
             <button
               key={p.key}
               onClick={() => setPhase(p.key)}
-              className={`w-full text-left rounded-xl border p-4 transition ${on ? 'border-slate-900 bg-slate-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+              className={`w-full rounded-xl border p-4 text-left transition-colors ${
+                on ? 'border-brand-lavender bg-brand-soft' : 'border-border bg-card hover:border-slate-300'
+              }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-slate-900">{p.label}</span>
-                {on && <Check className="w-4 h-4 text-emerald-600" />}
+              <div className="flex items-center justify-between gap-3">
+                <span className={`text-sm font-medium ${on ? 'text-primary' : 'text-foreground'}`}>{p.label}</span>
+                {on && (
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <Check className="h-3 w-3" />
+                  </span>
+                )}
               </div>
-              <div className="text-xs text-slate-500 mt-1">{p.desc}</div>
+              <div className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{p.desc}</div>
             </button>
           );
         })}

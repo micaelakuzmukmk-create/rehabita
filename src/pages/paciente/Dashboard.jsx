@@ -5,7 +5,13 @@ import { METRIC_MAP, PHASE_LABELS, qualitative, metricDelta } from '@/lib/rehbai
 import ProgressRing from '@/components/paciente/ProgressRing';
 import StatCard from '@/components/paciente/StatCard';
 import EvolutionChart from '@/components/paciente/EvolutionChart';
-import { HeartPulse, MessageSquareQuote, Sparkles, Quote } from 'lucide-react';
+import PageHeader from '@/components/ds/PageHeader';
+import SectionCard from '@/components/ds/SectionCard';
+import Card from '@/components/ds/Card';
+import Chip from '@/components/ds/Chip';
+import LoadingState from '@/components/ds/LoadingState';
+import { Button } from '@/components/ui/button';
+import { Activity, ArrowUpRight, HeartPulse, MessageSquareQuote, Sparkles, Quote, ClipboardList } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -74,8 +80,8 @@ export default function PatientDashboard() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando…</div>;
-  if (!patient) return <div className="text-sm text-slate-400">No tenés un paciente vinculado. Pedí a tu kinesiólogo que te asigne.</div>;
+  if (loading) return <LoadingState label="Cargando tu información…" />;
+  if (!patient) return <div className="text-sm text-muted-foreground">No tenés un paciente vinculado. Pedí a tu kinesiólogo que te asigne.</div>;
 
   const sessionsAsc = [...sessions].sort((a, b) => new Date(a.date) - new Date(b.date));
   const metricBySession = Object.fromEntries(metrics.map(m => [m.session_id, m]));
@@ -111,7 +117,7 @@ export default function PatientDashboard() {
 
   let motivation = 'Seguí con tu plan, cada sesión cuenta.';
   if (lastM && prev) {
-    if (lastM.confidence_perceived > prev.confidence_perceived) motivation = '¡Tu confianza está creciendo! 🌱';
+    if (lastM.confidence_perceived > prev.confidence_perceived) motivation = '¡Tu confianza está creciendo!';
     else if (lastM.confidence_perceived < prev.confidence_perceived) motivation = 'Hubo un pequeño bajón, es parte del proceso. Vamos de a poco.';
     else motivation = 'Vas sostenido. La constancia es clave.';
   } else if (!lastM) {
@@ -122,100 +128,115 @@ export default function PatientDashboard() {
   const olderComments = comments.slice(1);
 
   return (
-    <div className="space-y-5">
-      {/* Encabezado */}
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Hola, {patient.full_name.split(' ')[0]} 👋</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Sesión <span className="font-semibold text-slate-700">Nº {currentSessionNumber}</span> · rehabilitación de rodilla {patient.injury_side}
-          </p>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        eyebrow="Área Paciente"
+        title={`Hola, ${patient.full_name.split(' ')[0]}`}
+        subtitle={
+          <span>
+            Sesión <span className="font-medium text-foreground">Nº {currentSessionNumber}</span> · rehabilitación de rodilla {patient.injury_side}
+          </span>
+        }
+      />
 
       {/* Progreso general + mensaje */}
-      <div className="rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-sky-50 border border-emerald-100 p-5">
-        <div className="flex flex-col sm:flex-row items-center gap-6">
+      <Card className="relative overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-brand-soft blur-3xl" />
+        <div className="relative flex flex-col items-center gap-6 p-6 sm:flex-row sm:p-7">
           <div className="flex flex-col items-center">
-            <ProgressRing value={score} color="#10b981" label="progreso general" />
-            <div className="text-xs text-slate-500 mt-1">Progreso general</div>
+            <ProgressRing value={score} size={140} color="#3B1A7B" label="progreso general" />
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <div className="flex items-center gap-2 text-emerald-700 text-sm font-medium justify-center sm:justify-start">
-              <HeartPulse className="w-4 h-4" /> Tu mensaje de hoy
+            <div className="eyebrow flex items-center justify-center gap-1.5 sm:justify-start">
+              <HeartPulse className="h-3.5 w-3.5 text-brand-cyan" /> Tu mensaje de hoy
             </div>
-            <p className="text-slate-800 text-lg mt-1.5 leading-snug">{motivation}</p>
+            <p className="mt-2 font-heading text-lg font-medium leading-snug text-foreground sm:text-xl">{motivation}</p>
             {prevScore != null && (
-              <div className="mt-2 text-sm text-slate-500">
-                {score > prevScore ? <span className="text-emerald-600 font-medium">↑ {score - prevScore} pts</span>
-                  : score < prevScore ? <span className="text-amber-600 font-medium">↓ {prevScore - score} pts</span>
-                  : <span className="text-slate-500 font-medium">igual</span>}
-                {' '}respecto de tu sesión anterior
+              <div className="mt-3 flex items-center justify-center gap-2 sm:justify-start">
+                <Chip tone={score >= prevScore ? 'primary' : 'warning'} dot>
+                  {score > prevScore ? `+${score - prevScore} pts` : score < prevScore ? `${score - prevScore} pts` : 'igual'}
+                </Chip>
+                <span className="text-[11px] text-muted-foreground">respecto de tu sesión anterior</span>
               </div>
             )}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Evolución */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex items-center gap-2 text-slate-800 font-semibold"><Sparkles className="w-4 h-4 text-amber-500" /> Tu evolución</div>
-        <p className="text-sm text-slate-500 mt-1 mb-3">
-          Así vienen simetría, estabilidad y flexión sesión a sesión. No siempre es una línea recta: las mesetas y los pequeños descensos son parte del proceso.
-        </p>
+      <SectionCard
+        icon={Sparkles}
+        title="Tu evolución"
+        description="Así vienen simetría, estabilidad y flexión sesión a sesión. No siempre es una línea recta: las mesetas y los pequeños descensos son parte del proceso."
+      >
         <EvolutionChart data={chartData} keys={EVOLUTION_KEYS} />
-      </div>
+      </SectionCard>
 
       {/* Indicadores actuales con comparación */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-slate-800 font-semibold">Tus indicadores</div>
+      <section>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="section-title">Tus indicadores</h2>
           {comparable.length > 0 && (
-            <div className="text-xs text-slate-500">
-              vs. sesión anterior: <span className="font-medium text-emerald-600">{improvedCount}</span> de {comparable.length} mejoraron
-            </div>
+            <span className="text-[11px] text-muted-foreground">
+              vs. sesión anterior: <span className="font-semibold text-primary">{improvedCount}</span> de {comparable.length} mejoraron
+            </span>
           )}
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {CARD_KEYS.map(k => <StatCard key={k} metricKey={k} value={lastM?.[k]} prev={prev?.[k]} />)}
         </div>
-      </div>
+      </section>
 
       {/* Último comentario del kinesiólogo */}
       {latestComment && (
-        <div className="rounded-2xl border border-sky-100 bg-sky-50/60 p-5">
-          <div className="flex items-center gap-2 text-sky-700 text-sm font-medium">
-            <MessageSquareQuote className="w-4 h-4" /> Último comentario de tu kinesiólogo
+        <div className="rounded-2xl border border-border bg-brand-mist p-5 sm:p-6">
+          <div className="eyebrow flex items-center gap-1.5 text-primary">
+            <MessageSquareQuote className="h-3.5 w-3.5" /> Último comentario de tu kinesiólogo
           </div>
-          <div className="flex gap-2 mt-2">
-            <Quote className="w-4 h-4 text-sky-300 shrink-0 mt-0.5" />
+          <div className="mt-2.5 flex gap-2">
+            <Quote className="mt-0.5 h-4 w-4 shrink-0 text-brand-sky" />
             <div>
-              <p className="text-slate-800 leading-relaxed whitespace-pre-wrap">{latestComment.content}</p>
-              <div className="text-xs text-slate-400 mt-1.5">{format(parseISO(latestComment.date), "dd/MM/yyyy")}</div>
+              <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">{latestComment.content}</p>
+              <div className="mt-2 text-[11px] text-muted-foreground">{format(parseISO(latestComment.date), "dd/MM/yyyy")}</div>
             </div>
           </div>
         </div>
       )}
 
       {/* ¿Cómo te sentís hoy? */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="font-medium text-slate-800 mb-3">¿Cómo te sentís hoy?</div>
-        <div className="grid sm:grid-cols-2 gap-5">
+      <SectionCard icon={Activity} title="¿Cómo te sentís hoy?" description="Registrá tu percepción para acompañar la lectura de tus datos.">
+        <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <div className="flex items-center justify-between text-sm mb-1">
-              <span className="text-slate-600">Dolor percibido</span>
-              <span className="font-medium text-slate-900">{pain}/10</span>
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="text-[13px] text-muted-foreground">Dolor percibido</span>
+              <span className="font-heading text-sm font-semibold text-foreground tabular-nums">{pain}/10</span>
             </div>
-            <input type="range" min={0} max={10} step={1} value={pain} onChange={e => setPain(Number(e.target.value))} className="w-full accent-rose-500" />
-            <div className="text-xs text-slate-400 mt-1">{qualitative('pain_perceived', pain)}</div>
+            <input
+              type="range"
+              min={0}
+              max={10}
+              step={1}
+              value={pain}
+              onChange={e => setPain(Number(e.target.value))}
+              className="w-full accent-primary"
+            />
+            <div className="mt-1 text-[11px] text-muted-foreground">{qualitative('pain_perceived', pain)}</div>
           </div>
           <div>
-            <div className="flex items-center justify-between text-sm mb-1">
-              <span className="text-slate-600">Confianza corporal</span>
-              <span className="font-medium text-slate-900">{confidence}/100</span>
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="text-[13px] text-muted-foreground">Confianza corporal</span>
+              <span className="font-heading text-sm font-semibold text-foreground tabular-nums">{confidence}/100</span>
             </div>
-            <input type="range" min={0} max={100} step={5} value={confidence} onChange={e => setConfidence(Number(e.target.value))} className="w-full accent-emerald-500" />
-            <div className="text-xs text-slate-400 mt-1">{qualitative('confidence_perceived', confidence)}</div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              value={confidence}
+              onChange={e => setConfidence(Number(e.target.value))}
+              className="w-full accent-primary"
+            />
+            <div className="mt-1 text-[11px] text-muted-foreground">{qualitative('confidence_perceived', confidence)}</div>
           </div>
         </div>
         <textarea
@@ -223,57 +244,72 @@ export default function PatientDashboard() {
           onChange={e => setPerceptionNote(e.target.value)}
           placeholder="Notas (opcional)…"
           rows={2}
-          className="w-full mt-3 text-sm rounded-lg border border-slate-200 p-3 focus:outline-none focus:border-slate-400 resize-none"
+          className="input mt-4 resize-none"
         />
-        <button onClick={savePerception} disabled={saving} className="mt-2 text-sm px-4 py-2 rounded-lg bg-slate-900 text-white disabled:opacity-40">
+        <Button onClick={savePerception} disabled={saving} className="mt-3">
           {saving ? 'Guardando…' : 'Registrar'}
-        </button>
-      </div>
+        </Button>
+      </SectionCard>
 
       {/* Plan */}
       {plan && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <div className="font-medium text-slate-800 mb-2">Tu plan de rehabilitación</div>
-          <div className="text-sm text-slate-700">{plan.title}</div>
-          {plan.description && <p className="text-sm text-slate-500 mt-1">{plan.description}</p>}
-          <div className="flex flex-wrap gap-2 mt-3 text-xs">
-            <span className="px-2 py-1 rounded-full bg-blue-50 text-blue-700">Etapa: {PHASE_LABELS[plan.current_phase]}</span>
-            <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-600 capitalize">{plan.status}</span>
-            {plan.target_end_date && <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-600">Objetivo: {format(parseISO(plan.target_end_date), 'dd/MM/yyyy')}</span>}
+        <SectionCard
+          icon={ClipboardList}
+          title="Tu plan de rehabilitación"
+          action={<Link to="/paciente/plan" className="inline-flex items-center gap-1 text-[13px] font-medium text-primary hover:underline">Ver plan <ArrowUpRight className="h-3.5 w-3.5" /></Link>}
+        >
+          <div className="text-sm font-medium text-foreground">{plan.title}</div>
+          {plan.description && <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{plan.description}</p>}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Chip tone="primary">Etapa: {PHASE_LABELS[plan.current_phase]}</Chip>
+            <Chip tone="neutral" className="capitalize">{plan.status}</Chip>
+            {plan.target_end_date && <Chip tone="cyan">Objetivo: {format(parseISO(plan.target_end_date), 'dd/MM/yyyy')}</Chip>}
           </div>
-        </div>
+        </SectionCard>
       )}
 
       {/* Sesiones recientes */}
-      <div>
-        <div className="font-medium text-slate-800 mb-3">Tus sesiones</div>
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="section-title">Tus sesiones</h2>
+          <Link to="/paciente/sesiones" className="text-[13px] font-medium text-primary hover:underline">Ver todas</Link>
+        </div>
         <div className="space-y-2">
-          {sessions.length === 0 && <div className="text-sm text-slate-400">Aún no hay sesiones</div>}
+          {sessions.length === 0 && <div className="text-sm text-muted-foreground">Aún no hay sesiones</div>}
           {[...sessions].sort((a, b) => new Date(b.date) - new Date(a.date)).map((s, i) => (
-            <Link key={s.id} to={`/paciente/sesion/${s.id}`} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 hover:border-slate-300 transition">
-              <div>
-                <div className="text-sm font-medium text-slate-900">Sesión {s.session_number ?? sessions.length - i}</div>
-                <div className="text-xs text-slate-500">{format(parseISO(s.date), "dd/MM/yyyy")}</div>
+            <Link
+              key={s.id}
+              to={`/paciente/sesion/${s.id}`}
+              className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3.5 transition-colors hover:border-brand-lavender"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-[13px] font-semibold text-primary">
+                  {s.session_number ?? sessions.length - i}
+                </span>
+                <div>
+                  <div className="text-sm font-medium text-foreground">Sesión {s.session_number ?? sessions.length - i}</div>
+                  <div className="text-[11px] text-muted-foreground">{format(parseISO(s.date), "dd/MM/yyyy")}</div>
+                </div>
               </div>
-              <span className="text-sm text-slate-400">Ver reporte →</span>
+              <span className="text-[13px] text-muted-foreground">Ver reporte →</span>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Comentarios anteriores */}
       {olderComments.length > 0 && (
-        <div>
-          <div className="font-medium text-slate-800 mb-3">Comentarios anteriores</div>
+        <section>
+          <h2 className="section-title mb-3">Comentarios anteriores</h2>
           <div className="space-y-2">
             {olderComments.map(c => (
-              <div key={c.id} className="rounded-xl border border-slate-200 bg-white p-4">
-                <div className="text-xs text-slate-400 mb-1">{format(parseISO(c.date), "dd/MM/yyyy")}</div>
-                <p className="text-sm text-slate-700 whitespace-pre-wrap">{c.content}</p>
+              <div key={c.id} className="rounded-xl border border-border bg-card p-4">
+                <div className="mb-1 text-[11px] text-muted-foreground">{format(parseISO(c.date), "dd/MM/yyyy")}</div>
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{c.content}</p>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </div>
   );

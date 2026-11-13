@@ -8,9 +8,40 @@ module.exports = {
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			sm: 'calc(var(--radius) - 4px)',
+  			xl: 'calc(var(--radius) - 4px)',
+  			'2xl': 'calc(var(--radius) + 4px)',
+  			'3xl': 'calc(var(--radius) + 14px)'
+  		},
+  		boxShadow: {
+  			surface: '0 1px 2px rgba(30, 20, 70, 0.04), 0 10px 30px -24px rgba(30, 20, 70, 0.28)',
+  			soft: '0 1px 2px rgba(30, 20, 70, 0.03)'
   		},
   		colors: {
+  			/* Neutros con leve tinte violeta para toda la interfaz */
+  			slate: {
+  				50: '#F7F7FA',
+  				100: '#F0EFF5',
+  				200: '#E9E9EE',
+  				300: '#D8D6E2',
+  				400: '#ABA7BA',
+  				500: '#7C7890',
+  				600: '#615D74',
+  				700: '#4C4860',
+  				800: '#38344A',
+  				900: '#26233A'
+  			},
+  			brand: {
+  				DEFAULT: 'hsl(var(--brand-violet))',
+  				violet: 'hsl(var(--brand-violet))',
+  				lavender: 'hsl(var(--brand-lavender))',
+  				cyan: 'hsl(var(--brand-cyan))',
+  				sky: 'hsl(var(--brand-sky))',
+  				blue: 'hsl(var(--brand-blue))',
+  				soft: 'hsl(var(--brand-soft))',
+  				mist: 'hsl(var(--brand-mist))',
+  				line: 'hsl(var(--border))'
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -84,11 +115,16 @@ module.exports = {
   				to: {
   					height: '0'
   				}
+  			},
+  			'fade-rise': {
+  				from: { opacity: '0', transform: 'translateY(6px)' },
+  				to: { opacity: '1', transform: 'translateY(0)' }
   			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+  			'fade-rise': 'fade-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both'
   		}
   	}
   },

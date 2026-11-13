@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { METRICS, METRIC_MAP, qualitative } from '@/lib/rehbaita';
 import MetricChart from '@/components/MetricChart';
-import { ArrowLeft, Activity, HeartPulse, TrendingUp, MessageSquare } from 'lucide-react';
+import PageHeader from '@/components/ds/PageHeader';
+import SectionCard from '@/components/ds/SectionCard';
+import Card from '@/components/ds/Card';
+import StatTile from '@/components/ds/StatTile';
+import LoadingState from '@/components/ds/LoadingState';
+import { Activity, HeartPulse, TrendingUp, MessageSquare, Sparkles } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -39,7 +44,7 @@ export default function PatientSessionReport() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando reporte…</div>;
+  if (loading) return <LoadingState label="Cargando reporte…" />;
   if (!session) return null;
 
   const sessionsAsc = [...allSessions].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -57,65 +62,81 @@ export default function PatientSessionReport() {
   // mensaje simple
   let headline = 'Sesión completada. Seguí así.';
   if (metrics && prev) {
-    if (metrics.confidence_perceived > prev.confidence_perceived) headline = 'Mejoraste tu confianza respecto a la sesión anterior. 🌱';
+    if (metrics.confidence_perceived > prev.confidence_perceived) headline = 'Mejoraste tu confianza respecto a la sesión anterior.';
     else if (metrics.pain_perceived < prev.pain_perceived) headline = 'Sentiste menos dolor que la última vez. ¡Buen avance!';
     else if (metrics.symmetry > prev.symmetry) headline = 'Tu simetría mejoró. Vas por buen camino.';
     else headline = 'Sesión sostenida. La constancia también es progreso.';
   }
 
   const simple = [
-    { key: 'symmetry', icon: <Activity className="w-5 h-5 text-blue-600" />, text: 'Qué tan parecido trabajan ambas piernas' },
-    { key: 'pain_perceived', icon: <HeartPulse className="w-5 h-5 text-rose-500" />, text: 'Dolor que sentiste durante la sesión' },
-    { key: 'confidence_perceived', icon: <TrendingUp className="w-5 h-5 text-emerald-600" />, text: 'Cuánta confianza sentiste en tu rodilla' },
+    { key: 'symmetry', icon: Activity, text: 'Qué tan parecido trabajan ambas piernas' },
+    { key: 'pain_perceived', icon: HeartPulse, text: 'Dolor que sentiste durante la sesión' },
+    { key: 'confidence_perceived', icon: TrendingUp, text: 'Cuánta confianza sentiste en tu rodilla' },
   ];
 
   return (
-    <div className="space-y-5">
-      <Link to="/paciente" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900">
-        <ArrowLeft className="w-4 h-4" /> Volver
-      </Link>
+    <div className="space-y-6">
+      <PageHeader
+        back={{ to: '/paciente', label: 'Volver' }}
+        eyebrow="Reporte de sesión"
+        title={`Sesión ${session.session_number}`}
+        subtitle={format(parseISO(session.date), "dd/MM/yyyy")}
+      />
 
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">Reporte de sesión {session.session_number}</h1>
-        <div className="text-sm text-slate-500">{format(parseISO(session.date), "dd/MM/yyyy")}</div>
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-brand-mist p-5 sm:p-6">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-brand-soft blur-3xl" />
+        <div className="relative flex items-start gap-3">
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-brand-blue" />
+          <p className="text-[15px] leading-relaxed text-foreground">{headline}</p>
+        </div>
       </div>
 
-      <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-sky-50 border border-emerald-100 p-5">
-        <p className="text-slate-800">{headline}</p>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {simple.map(s => {
+          const Icon = s.icon;
+          return (
+            <StatTile
+              key={s.key}
+              label={METRIC_MAP[s.key].label}
+              value={metrics ? metrics[s.key] : null}
+              unit={METRIC_MAP[s.key].unit}
+              hint={metrics ? qualitative(s.key, metrics[s.key]) : ''}
+              icon={Icon}
+            />
+          );
+        })}
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-3">
-        {simple.map(s => (
-          <div key={s.key} className="rounded-2xl border border-slate-200 bg-white p-4">
-            <div className="flex items-center gap-2 text-slate-500 text-sm">{s.icon} {METRIC_MAP[s.key].label}</div>
-            <div className="mt-2 flex items-baseline gap-1.5">
-              <span className="text-2xl font-semibold text-slate-900">{metrics ? (metrics[s.key] ?? '—') : '—'}</span>
-              <span className="text-xs text-slate-400">{METRIC_MAP[s.key].unit}</span>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {simple.map(s => {
+          const Icon = s.icon;
+          return (
+            <div key={`${s.key}-hint`} className="flex items-start gap-2.5 rounded-xl border border-border bg-card px-4 py-3">
+              <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+              <span className="text-[11px] leading-relaxed text-muted-foreground">{s.text}</span>
             </div>
-            <div className="text-xs text-slate-500 mt-1">{metrics ? qualitative(s.key, metrics[s.key]) : ''}</div>
-            <div className="text-xs text-slate-400 mt-1">{s.text}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="font-medium text-slate-700 mb-1">Tu evolución</div>
-        <p className="text-sm text-slate-500 mb-4">Compará esta sesión con las anteriores. Los altibajos son parte del proceso.</p>
+      <SectionCard icon={TrendingUp} title="Tu evolución" description="Compará esta sesión con las anteriores. Los altibajos son parte del proceso.">
         <MetricChart data={chartData} metrics={METRICS.filter(m => ['symmetry', 'confidence_perceived', 'pain_perceived'].includes(m.key))} />
-      </div>
+      </SectionCard>
 
       {comments.length > 0 && (
-        <div>
-          <div className="font-medium text-slate-700 mb-2 flex items-center gap-1.5"><MessageSquare className="w-4 h-4" /> Comentario de tu kinesiólogo</div>
+        <section>
+          <h2 className="section-title mb-3 flex items-center gap-1.5">
+            <MessageSquare className="h-4 w-4 text-muted-foreground" /> Comentario de tu kinesiólogo
+          </h2>
           <div className="space-y-2">
             {comments.map(c => (
-              <div key={c.id} className="rounded-xl border border-slate-200 bg-white p-4">
-                <div className="text-xs text-slate-400 mb-1">{format(parseISO(c.date), "dd/MM/yyyy")}</div>
-                <p className="text-sm text-slate-700 whitespace-pre-wrap">{c.content}</p>
-              </div>
+              <Card key={c.id} className="p-4">
+                <div className="mb-1 text-[11px] text-muted-foreground">{format(parseISO(c.date), "dd/MM/yyyy")}</div>
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{c.content}</p>
+              </Card>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </div>
   );

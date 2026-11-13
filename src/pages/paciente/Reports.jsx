@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { ArrowLeft, MessageSquare } from 'lucide-react';
+import PageHeader from '@/components/ds/PageHeader';
+import Card from '@/components/ds/Card';
+import LoadingState from '@/components/ds/LoadingState';
+import EmptyState from '@/components/ds/EmptyState';
+import { MessageSquare, ArrowUpRight, FileText } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
 import { refreshBadges } from '@/hooks/usePatientBadges';
@@ -44,8 +48,8 @@ export default function Reports() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando…</div>;
-  if (!patient) return <div className="text-sm text-slate-400">No tenés un paciente vinculado.</div>;
+  if (loading) return <LoadingState label="Cargando tus reportes…" />;
+  if (!patient) return <div className="text-sm text-muted-foreground">No tenés un paciente vinculado.</div>;
 
   const sessionById = Object.fromEntries(sessions.map(s => [s.id, s]));
 
@@ -67,50 +71,57 @@ export default function Reports() {
   });
 
   return (
-    <div className="space-y-5">
-      <Link to="/paciente" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900">
-        <ArrowLeft className="w-4 h-4" /> Volver
-      </Link>
-
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">Reportes</h1>
-        <p className="text-sm text-slate-500">Las devoluciones de tu kinesiólogo, sesión a sesión.</p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        back={{ to: '/paciente', label: 'Volver' }}
+        eyebrow="Área Paciente"
+        title="Reportes"
+        subtitle="Las devoluciones de tu kinesiólogo, sesión a sesión."
+      />
 
       {groupKeys.length === 0 ? (
-        <div className="text-sm text-slate-400">Todavía no tenés devoluciones de tu kinesiólogo.</div>
+        <EmptyState
+          icon={FileText}
+          title="Todavía no hay devoluciones"
+          description="Cuando tu kinesiólogo registre un comentario de una sesión, lo vas a encontrar acá."
+        />
       ) : (
         <div className="space-y-4">
           {groupKeys.map(key => {
             const s = sessionById[key];
             const items = grouped[key];
             return (
-              <div key={key} className="rounded-2xl border border-slate-200 bg-white p-5">
-                <div className="flex items-start justify-between gap-3 mb-3">
+              <Card key={key} className="p-5 sm:p-6">
+                <div className="mb-4 flex items-start justify-between gap-3 border-b border-border pb-3">
                   <div>
-                    <div className="font-semibold text-slate-900">
+                    <div className="font-heading text-[15px] font-semibold tracking-tight text-foreground">
                       {s ? `Sesión ${s.session_number}` : 'Comentarios generales'}
                     </div>
-                    {s && <div className="text-xs text-slate-500">{format(parseISO(s.date), 'dd/MM/yyyy')}</div>}
+                    {s && <div className="mt-0.5 text-[11px] text-muted-foreground">{format(parseISO(s.date), 'dd/MM/yyyy')}</div>}
                   </div>
                   {s && (
-                    <Link to={`/paciente/sesion/${s.id}`} className="text-xs text-teal-700 hover:underline whitespace-nowrap">
-                      Ver sesión
+                    <Link
+                      to={`/paciente/sesion/${s.id}`}
+                      className="inline-flex items-center gap-1 text-[13px] font-medium text-primary hover:underline"
+                    >
+                      Ver sesión <ArrowUpRight className="h-3.5 w-3.5" />
                     </Link>
                   )}
                 </div>
                 <div className="space-y-3">
                   {items.map(c => (
-                    <div key={c.id} className="flex items-start gap-2 text-sm text-slate-700">
-                      <MessageSquare className="w-4 h-4 text-slate-300 mt-0.5 shrink-0" />
+                    <div key={c.id} className="flex items-start gap-2.5">
+                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
+                        <MessageSquare className="h-3.5 w-3.5" />
+                      </span>
                       <div>
-                        <p>{c.content}</p>
-                        <div className="text-[11px] text-slate-400 mt-0.5">{format(parseISO(c.date), 'dd/MM/yyyy HH:mm')}</div>
+                        <p className="text-sm leading-relaxed text-foreground">{c.content}</p>
+                        <div className="mt-1 text-[10px] text-muted-foreground">{format(parseISO(c.date), 'dd/MM/yyyy HH:mm')}</div>
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

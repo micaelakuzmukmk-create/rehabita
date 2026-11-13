@@ -1,16 +1,18 @@
 import React from 'react';
+import PageHeader from '@/components/ds/PageHeader';
 
 export default function AreaPlaceholder({ title, description, icon: Icon }) {
   return (
-    <div className="max-w-2xl">
-      <div className="flex items-center gap-2 mb-1">
-        {Icon && <Icon className="w-5 h-5 text-slate-500" />}
-        <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
-      </div>
-      {description && <p className="text-sm text-slate-500">{description}</p>}
-      <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
-        <div className="text-sm font-medium text-slate-500">Sección en desarrollo</div>
-        <p className="text-sm text-slate-500 mt-1">
+    <div className="max-w-2xl space-y-6">
+      <PageHeader eyebrow="ReHabita" title={title} subtitle={description} />
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card px-6 py-12 text-center">
+        {Icon && (
+          <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
+            <Icon className="h-5 w-5" />
+          </span>
+        )}
+        <div className="section-title">Sección en desarrollo</div>
+        <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-muted-foreground">
           Esta pantalla formará parte del área y estará disponible próximamente dentro de ReHabita.
         </p>
       </div>
