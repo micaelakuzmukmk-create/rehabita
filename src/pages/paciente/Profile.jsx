@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { ArrowLeft } from 'lucide-react';
+import PageHeader from '@/components/ds/PageHeader';
+import Card from '@/components/ds/Card';
+import Chip from '@/components/ds/Chip';
+import LoadingState from '@/components/ds/LoadingState';
 import { format, parseISO, differenceInYears } from 'date-fns';
 import toast from 'react-hot-toast';
 import { loadCurrentPatient } from '@/lib/currentPatient';
@@ -42,8 +44,8 @@ export default function Profile() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando…</div>;
-  if (!patient) return <div className="text-sm text-slate-400">No tenés un paciente vinculado.</div>;
+  if (loading) return <LoadingState label="Cargando tu perfil…" />;
+  if (!patient) return <div className="text-sm text-muted-foreground">No tenés un paciente vinculado.</div>;
 
   const initial = (patient.full_name || 'P').charAt(0).toUpperCase();
   const fmtDate = (d) => (d ? format(d instanceof Date ? d : parseISO(d), 'dd/MM/yyyy') : null);
@@ -70,48 +72,59 @@ export default function Profile() {
     { label: 'Fecha de hoy', value: fmtDate(new Date()) },
   ];
 
+  const DataList = ({ rows }) => (
+    <dl className="divide-y divide-border">
+      {rows.map(r => (
+        <div key={r.label} className="flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0">
+          <dt className="text-[13px] text-muted-foreground">{r.label}</dt>
+          <dd className="text-right text-[13px] font-medium text-foreground">{r.value || '—'}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+
   return (
-    <div className="space-y-5">
-      <Link to="/paciente" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900">
-        <ArrowLeft className="w-4 h-4" /> Volver
-      </Link>
+    <div className="space-y-6">
+      <PageHeader
+        back={{ to: '/paciente', label: 'Volver' }}
+        eyebrow="Área Paciente"
+        title="Mi perfil"
+        subtitle="Tus datos personales y el detalle de tu rehabilitación."
+      />
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 flex items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-slate-900 text-white flex items-center justify-center text-2xl font-semibold shrink-0">
-          {initial}
-        </div>
-        <div className="min-w-0">
-          <div className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 truncate">
-            {patient.full_name}
+      <Card className="relative overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-28 h-64 w-64 rounded-full bg-brand-soft blur-3xl" />
+        <div className="relative flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:p-6">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-secondary font-heading text-2xl font-semibold text-primary">
+            {initial}
           </div>
-          <div className="text-sm text-slate-500 mt-1">
-            {[knee ? `Rodilla ${knee.toLowerCase()}` : null, patient.injury_type || DEFAULT_INJURY].filter(Boolean).join(' · ')}
+          <div className="min-w-0">
+            <div className="eyebrow">Paciente</div>
+            <h2 className="mt-1 truncate font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-[28px]">
+              {patient.full_name}
+            </h2>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Chip tone="primary" dot>Rodilla {knee ? knee.toLowerCase() : '—'}</Chip>
+              <Chip tone="neutral">{patient.injury_type || DEFAULT_INJURY}</Chip>
+            </div>
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div>
-        <div className="text-sm font-medium text-slate-700 mb-2">Tus datos</div>
-        <div className="rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100">
-          {mainRows.map(r => (
-            <div key={r.label} className="flex items-start justify-between gap-4 px-5 py-3.5">
-              <span className="text-sm text-slate-500">{r.label}</span>
-              <span className="text-sm text-slate-900 font-medium text-right">{r.value || '—'}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="p-5 sm:p-6">
+          <h2 className="section-title">Tus datos</h2>
+          <div className="mt-4">
+            <DataList rows={mainRows} />
+          </div>
+        </Card>
 
-      <div>
-        <div className="text-sm font-medium text-slate-700 mb-2">Más datos</div>
-        <div className="rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100">
-          {extraRows.map(r => (
-            <div key={r.label} className="flex items-start justify-between gap-4 px-5 py-3.5">
-              <span className="text-sm text-slate-500">{r.label}</span>
-              <span className="text-sm text-slate-900 font-medium text-right">{r.value || '—'}</span>
-            </div>
-          ))}
-        </div>
+        <Card className="p-5 sm:p-6">
+          <h2 className="section-title">Más datos</h2>
+          <div className="mt-4">
+            <DataList rows={extraRows} />
+          </div>
+        </Card>
       </div>
     </div>
   );

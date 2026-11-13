@@ -1,33 +1,35 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
+import EmptyState from '@/components/ds/EmptyState';
 
 export default function FriendsList({ friends, onOpen }) {
   if (friends.length === 0) {
     return (
-      <div className="text-sm text-slate-400">
-        Todavía no tenés amigos en rehabilitación. Enviá una solicitud desde la pestaña Compañeros.
-      </div>
+      <EmptyState
+        title="Todavía no tenés amigos en rehabilitación"
+        description="Enviá una solicitud desde la pestaña Compañeros para acompañarse en el proceso."
+      />
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {friends.map(({ friendship, patient }) => (
         <button
           key={friendship.id}
           onClick={() => onOpen(friendship.id)}
-          className="w-full flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left hover:border-slate-300 transition"
+          className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 text-left transition-colors hover:border-brand-lavender"
         >
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-11 h-11 rounded-full bg-slate-900 text-white flex items-center justify-center font-medium shrink-0">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary font-heading text-sm font-semibold text-primary">
               {(patient.full_name || '?').charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <div className="font-medium text-slate-900 truncate">{patient.full_name}</div>
-              <div className="text-xs text-slate-500 mt-0.5">En rehabilitación</div>
+              <div className="truncate text-sm font-medium text-foreground">{patient.full_name}</div>
+              <div className="mt-0.5 text-[11px] text-muted-foreground">En rehabilitación</div>
             </div>
           </div>
-          <MessageCircle className="w-4 h-4 text-slate-400 shrink-0" />
+          <MessageCircle className="h-4 w-4 shrink-0 text-muted-foreground" />
         </button>
       ))}
     </div>

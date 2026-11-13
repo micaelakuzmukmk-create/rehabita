@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import SessionsCalendar from '@/components/paciente/SessionsCalendar';
-import { ArrowLeft, CheckCircle2, Clock, XCircle, Frown, Smile, CalendarDays } from 'lucide-react';
+import PageHeader from '@/components/ds/PageHeader';
+import SectionCard from '@/components/ds/SectionCard';
+import LoadingState from '@/components/ds/LoadingState';
+import { CheckCircle2, Clock, XCircle, Frown, Smile, CalendarDays } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const DEFAULT_TOTAL_SESSIONS = 24;
@@ -40,8 +42,8 @@ export default function PatientSessions() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando…</div>;
-  if (!patient) return <div className="text-sm text-slate-400">No tenés un paciente vinculado. Pedí a tu kinesiólogo que te asigne.</div>;
+  if (loading) return <LoadingState label="Cargando tus sesiones…" />;
+  if (!patient) return <div className="text-sm text-muted-foreground">No tenés un paciente vinculado. Pedí a tu kinesiólogo que te asigne.</div>;
 
   const sessionsAsc = [...sessions].sort((a, b) => new Date(a.date) - new Date(b.date));
   const metricBySession = Object.fromEntries(metrics.map(m => [m.session_id, m]));
@@ -55,50 +57,56 @@ export default function PatientSessions() {
   const withoutPain = completed.length - withPain;
 
   const stats = [
-    { label: 'Realizadas', value: `${completed.length} / ${total}`, icon: CheckCircle2, color: 'text-teal-600', bg: 'bg-teal-50' },
-    { label: 'Por realizar', value: remaining, icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Abandonadas', value: abandoned.length, icon: XCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
-    { label: 'Con dolor', value: withPain, icon: Frown, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Sin dolor', value: withoutPain, icon: Smile, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Realizadas', value: `${completed.length} / ${total}`, icon: CheckCircle2, tone: 'primary' },
+    { label: 'Por realizar', value: remaining, icon: Clock, tone: 'cyan' },
+    { label: 'Abandonadas', value: abandoned.length, icon: XCircle, tone: 'danger' },
+    { label: 'Con dolor', value: withPain, icon: Frown, tone: 'warning' },
+    { label: 'Sin dolor', value: withoutPain, icon: Smile, tone: 'success' },
   ];
+
+  const ICON_TONES = {
+    primary: 'bg-secondary text-primary',
+    cyan: 'bg-accent text-brand-blue',
+    danger: 'bg-rose-50 text-rose-600',
+    warning: 'bg-amber-50 text-amber-600',
+    success: 'bg-emerald-50 text-emerald-600',
+  };
 
   const sessionDates = sessionsAsc.map(s => s.date);
 
   return (
-    <div className="space-y-5">
-      <Link to="/paciente" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900">
-        <ArrowLeft className="w-4 h-4" /> Volver
-      </Link>
-
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">Mis sesiones</h1>
-        <p className="text-sm text-slate-500">Resumen de tus sesiones de rehabilitación.</p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        back={{ to: '/paciente', label: 'Volver' }}
+        eyebrow="Área Paciente"
+        title="Mis sesiones"
+        subtitle="Resumen de tus sesiones de rehabilitación."
+      />
 
       {/* Resumen */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {stats.map((st) => {
           const Icon = st.icon;
           return (
-            <div key={st.label} className="rounded-2xl border border-slate-200 bg-white p-4">
-              <div className={`w-8 h-8 rounded-lg ${st.bg} flex items-center justify-center mb-2`}>
-                <Icon className={`w-4 h-4 ${st.color}`} />
-              </div>
-              <div className="text-xl font-semibold text-slate-900">{st.value}</div>
-              <div className="text-xs text-slate-500">{st.label}</div>
+            <div key={st.label} className="card p-4">
+              <span className={`mb-3 flex h-8 w-8 items-center justify-center rounded-lg ${ICON_TONES[st.tone]}`}>
+                <Icon className="h-4 w-4" />
+              </span>
+              <div className="font-heading text-xl font-semibold leading-none tracking-tight text-foreground tabular-nums">{st.value}</div>
+              <div className="mt-1 text-[11px] text-muted-foreground">{st.label}</div>
             </div>
           );
         })}
       </div>
 
       {/* Calendario de sesiones */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex items-center gap-2 font-semibold text-slate-800 mb-1">
-          <CalendarDays className="w-4 h-4 text-slate-500" /> Fechas de tus sesiones
-        </div>
-        <p className="text-sm text-slate-500 mb-3">Los días marcados son las fechas en las que realizaste sesiones.</p>
+      <SectionCard
+        icon={CalendarDays}
+        title="Fechas de tus sesiones"
+        description="Los días marcados son las fechas en las que realizaste sesiones."
+      >
         <SessionsCalendar dates={sessionDates} />
-      </div>
+      </SectionCard>
     </div>
   );
 }

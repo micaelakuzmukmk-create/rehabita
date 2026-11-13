@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { loadCurrentPatient } from '@/lib/currentPatient';
 import { refreshBadges } from '@/hooks/usePatientBadges';
@@ -9,6 +7,9 @@ import PeopleList from '@/components/paciente/PeopleList';
 import RequestsList from '@/components/paciente/RequestsList';
 import FriendsList from '@/components/paciente/FriendsList';
 import ChatPanel from '@/components/paciente/ChatPanel';
+import PageHeader from '@/components/ds/PageHeader';
+import Tabs from '@/components/ds/Tabs';
+import LoadingState from '@/components/ds/LoadingState';
 
 export default function Friends() {
   const [me, setMe] = useState(null);
@@ -32,8 +33,8 @@ export default function Friends() {
 
   async function fetchMessages(patientId) {
     const [sent, received] = await Promise.all([
-      base44.entities.FriendMessage.filter({ sender_patient_id: patientId }, '-created_date', 300),
-      base44.entities.FriendMessage.filter({ recipient_patient_id: patientId }, '-created_date', 300),
+      base44.entities.FriendMessage.filter({ sender_patient_id: patientId }, 'created_date', 300),
+      base44.entities.FriendMessage.filter({ recipient_patient_id: patientId }, 'created_date', 300),
     ]);
     return [...sent, ...received].sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
   }
@@ -129,8 +130,8 @@ export default function Friends() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando…</div>;
-  if (!me) return <div className="text-sm text-slate-400">No tenés un paciente vinculado.</div>;
+  if (loading) return <LoadingState label="Cargando la sección Amigos…" />;
+  if (!me) return <div className="text-sm text-muted-foreground">No tenés un paciente vinculado.</div>;
 
   const patientById = Object.fromEntries(patients.map((person) => [person.id, person]));
   const plansByPatient = {};
@@ -161,28 +162,19 @@ export default function Friends() {
   ];
 
   return (
-    <div className="space-y-5">
-      <Link to="/paciente" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900">
-        <ArrowLeft className="w-4 h-4" /> Volver
-      </Link>
+    <div className="space-y-6">
+      <PageHeader
+        back={{ to: '/paciente', label: 'Volver' }}
+        eyebrow="Área Paciente"
+        title="Amigos"
+        subtitle="Conectá con otras personas que también están en rehabilitación."
+      />
 
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">Amigos</h1>
-        <p className="text-sm text-slate-500">Conectá con otras personas que también están en rehabilitación.</p>
-      </div>
-
-      <div className="flex gap-1 border-b border-slate-200 overflow-x-auto">
-        {tabs.map((item) => (
-          <button
-            key={item.key}
-            onClick={() => { setTab(item.key); setOpenId(null); }}
-            className={`px-3 py-2 text-sm border-b-2 -mb-px whitespace-nowrap ${tab === item.key ? 'border-slate-900 text-slate-900 font-medium' : 'border-transparent text-slate-500'}`}
-          >
-            {item.label}
-            {item.count ? <span className="ml-1.5 text-xs text-slate-400">{item.count}</span> : null}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        tabs={tabs}
+        value={tab}
+        onChange={(key) => { setTab(key); setOpenId(null); }}
+      />
 
       {tab === 'companeros' && (
         <PeopleList

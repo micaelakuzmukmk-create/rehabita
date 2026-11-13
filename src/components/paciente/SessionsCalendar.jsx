@@ -27,18 +27,30 @@ export default function SessionsCalendar({ dates = [] }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <button onClick={() => setMonth(subMonths(month, 1))} className="p-1.5 rounded-lg hover:bg-slate-100 transition" aria-label="Mes anterior">
-          <ChevronLeft className="w-4 h-4 text-slate-500" />
+      <div className="mb-4 flex items-center justify-between">
+        <button
+          onClick={() => setMonth(subMonths(month, 1))}
+          className="rounded-xl border border-border p-1.5 text-muted-foreground transition-colors hover:border-brand-lavender hover:text-primary"
+          aria-label="Mes anterior"
+        >
+          <ChevronLeft className="h-4 w-4" />
         </button>
-        <div className="text-sm font-medium text-slate-700 capitalize">{format(month, 'MMMM yyyy', { locale: es })}</div>
-        <button onClick={() => setMonth(addMonths(month, 1))} className="p-1.5 rounded-lg hover:bg-slate-100 transition" aria-label="Mes siguiente">
-          <ChevronRight className="w-4 h-4 text-slate-500" />
+        <div className="font-heading text-sm font-medium capitalize text-foreground">
+          {format(month, 'MMMM yyyy', { locale: es })}
+        </div>
+        <button
+          onClick={() => setMonth(addMonths(month, 1))}
+          className="rounded-xl border border-border p-1.5 text-muted-foreground transition-colors hover:border-brand-lavender hover:text-primary"
+          aria-label="Mes siguiente"
+        >
+          <ChevronRight className="h-4 w-4" />
         </button>
       </div>
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-1.5">
         {WEEKDAYS.map((w, i) => (
-          <div key={i} className="text-xs text-slate-400 py-1 text-center">{w}</div>
+          <div key={i} className="py-1 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {w}
+          </div>
         ))}
         {days.map((d, i) => {
           const c = countOn(d);
@@ -46,12 +58,17 @@ export default function SessionsCalendar({ dates = [] }) {
           return (
             <div
               key={i}
-              className={`aspect-square rounded-lg flex flex-col items-center justify-center text-sm ${
-                inMonth ? 'text-slate-700' : 'text-slate-300'
-              } ${c ? 'bg-teal-50 border border-teal-200 font-medium text-teal-800' : ''}`}
+              className={`flex aspect-square flex-col items-center justify-center rounded-xl text-[13px] transition-colors ${
+                c
+                  ? 'border border-brand-lavender bg-secondary font-semibold text-primary'
+                  : inMonth
+                    ? 'text-foreground'
+                    : 'text-slate-300'
+              }`}
             >
               <span>{format(d, 'd')}</span>
-              {c > 0 && <span className="text-[10px] leading-none text-teal-600">{c} ses.</span>}
+              {c > 0 && <span className="text-[9px] leading-none text-primary">{c} ses.</span>}
+              {c > 0 && <span className="mt-1 h-[3px] w-[3px] rounded-full bg-brand-cyan" />}
             </div>
           );
         })}

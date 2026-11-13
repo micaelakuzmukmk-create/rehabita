@@ -24,25 +24,26 @@ export function clearDemoRole() {
 }
 
 // Definición de métricas de sesión.
+// Colores alineados a la paleta ReHabita: un color = un indicador en toda la app.
 export const METRICS = [
-  { key: 'symmetry', label: 'Simetría', unit: '%', min: 0, max: 100, higherBetter: true, color: '#2563eb' },
-  { key: 'load_distribution', label: 'Distribución de carga', unit: '%', min: 0, max: 100, higherBetter: true, color: '#0891b2' },
-  { key: 'stability', label: 'Estabilidad', unit: '', min: 0, max: 100, higherBetter: true, color: '#16a34a' },
-  { key: 'reaction_time', label: 'Tiempo de reacción', unit: 'ms', min: 0, max: 1000, higherBetter: false, color: '#d97706' },
-  { key: 'movement_control', label: 'Control de movimiento', unit: '', min: 0, max: 100, higherBetter: true, color: '#7c3aed' },
-  { key: 'strength', label: 'Fuerza', unit: '', min: 0, max: 100, higherBetter: true, color: '#dc2626' },
-  { key: 'knee_flexion_angle', label: 'Ángulo flexión rodilla', unit: '°', min: 0, max: 150, higherBetter: true, color: '#0d9488' },
-  { key: 'pain_perceived', label: 'Dolor percibido', unit: '/10', min: 0, max: 10, higherBetter: false, color: '#e11d48' },
-  { key: 'confidence_perceived', label: 'Confianza percibida', unit: '', min: 0, max: 100, higherBetter: true, color: '#059669' },
+  { key: 'symmetry', label: 'Simetría', unit: '%', min: 0, max: 100, higherBetter: true, color: '#3B1A7B' },
+  { key: 'load_distribution', label: 'Distribución de carga', unit: '%', min: 0, max: 100, higherBetter: true, color: '#2CB1D2' },
+  { key: 'stability', label: 'Estabilidad', unit: '', min: 0, max: 100, higherBetter: true, color: '#9182FF' },
+  { key: 'reaction_time', label: 'Tiempo de reacción', unit: 'ms', min: 0, max: 1000, higherBetter: false, color: '#89D4E6' },
+  { key: 'movement_control', label: 'Control de movimiento', unit: '', min: 0, max: 100, higherBetter: true, color: '#6344B8' },
+  { key: 'strength', label: 'Fuerza', unit: '', min: 0, max: 100, higherBetter: true, color: '#22E2ED' },
+  { key: 'knee_flexion_angle', label: 'Ángulo flexión rodilla', unit: '°', min: 0, max: 150, higherBetter: true, color: '#5A9FC4' },
+  { key: 'pain_perceived', label: 'Dolor percibido', unit: '/10', min: 0, max: 10, higherBetter: false, color: '#D9A03C' },
+  { key: 'confidence_perceived', label: 'Confianza percibida', unit: '', min: 0, max: 100, higherBetter: true, color: '#4FD8E8' },
 ];
 
 export const METRIC_MAP = Object.fromEntries(METRICS.map(m => [m.key, m]));
 
 // Grupos musculares medidos en cada sesión.
 export const MUSCLE_GROUPS = [
-  { key: 'strength_vastus_medialis', label: 'Cuádriceps vasto interno', color: '#0d9488' },
-  { key: 'strength_vastus_lateralis', label: 'Cuádriceps vasto externo', color: '#2563eb' },
-  { key: 'strength_hamstrings', label: 'Isquiotibiales', color: '#7c3aed' },
+  { key: 'strength_vastus_medialis', label: 'Cuádriceps vasto interno', color: '#2CB1D2' },
+  { key: 'strength_vastus_lateralis', label: 'Cuádriceps vasto externo', color: '#22E2ED' },
+  { key: 'strength_hamstrings', label: 'Isquiotibiales', color: '#9182FF' },
 ];
 
 // Genera un valor de progreso no lineal (mejoras, mesetas, descensos) para una sesión i de n.

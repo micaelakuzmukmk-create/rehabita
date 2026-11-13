@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import ProgressRing from '@/components/paciente/ProgressRing';
 import MuscleStrengthChart from '@/components/paciente/MuscleStrengthChart';
 import InjuriousMovementsChart from '@/components/paciente/InjuriousMovementsChart';
 import MuscleActivitySummary from '@/components/paciente/MuscleActivitySummary';
-import { ArrowLeft, Activity, Dumbbell, AlertTriangle, CalendarCheck } from 'lucide-react';
+import PageHeader from '@/components/ds/PageHeader';
+import SectionCard from '@/components/ds/SectionCard';
+import LoadingState from '@/components/ds/LoadingState';
+import { Activity, Dumbbell, AlertTriangle, CalendarCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const DEFAULT_TOTAL_SESSIONS = 24;
@@ -52,8 +54,8 @@ export default function PatientProgress() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando…</div>;
-  if (!patient) return <div className="text-sm text-slate-400">No tenés un paciente vinculado. Pedí a tu kinesiólogo que te asigne.</div>;
+  if (loading) return <LoadingState label="Cargando tu progreso…" />;
+  if (!patient) return <div className="text-sm text-muted-foreground">No tenés un paciente vinculado. Pedí a tu kinesiólogo que te asigne.</div>;
 
   const sessionsAsc = [...sessions].sort((a, b) => new Date(a.date) - new Date(b.date));
   const metricBySession = Object.fromEntries(metrics.map(m => [m.session_id, m]));
@@ -74,63 +76,56 @@ export default function PatientProgress() {
   });
 
   return (
-    <div className="space-y-5">
-      <Link to="/paciente" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900">
-        <ArrowLeft className="w-4 h-4" /> Volver
-      </Link>
-
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">Mi progreso</h1>
-        <p className="text-sm text-slate-500">Cómo venís avanzando en tu rehabilitación, sesión a sesión.</p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        back={{ to: '/paciente', label: 'Volver' }}
+        eyebrow="Área Paciente"
+        title="Mi progreso"
+        subtitle="Cómo venís avanzando en tu rehabilitación, sesión a sesión."
+      />
 
       {/* Sesiones realizadas de las totales a realizar */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex items-center gap-2 font-semibold text-slate-800">
-          <CalendarCheck className="w-4 h-4 text-teal-600" /> Sesiones realizadas
-        </div>
-        <div className="flex flex-col sm:flex-row items-center gap-6 mt-4">
-          <ProgressRing value={pct} color="#0d9488" label="completadas" />
-          <div className="text-center sm:text-left flex-1">
-            <div className="text-2xl font-semibold text-slate-900">
-              {completed} <span className="text-base font-normal text-slate-400">de {total} sesiones</span>
+      <SectionCard
+        icon={CalendarCheck}
+        title="Sesiones realizadas"
+        description={plan ? `Plan: ${plan.title}` : 'Plan de rehabilitación'}
+      >
+        <div className="flex flex-col items-center gap-6 sm:flex-row">
+          <ProgressRing value={pct} size={132} color="#3B1A7B" label="completadas" />
+          <div className="flex-1 text-center sm:text-left">
+            <div className="flex items-baseline justify-center gap-1.5 sm:justify-start">
+              <span className="font-heading text-[34px] font-semibold leading-none tracking-tight text-foreground tabular-nums">{completed}</span>
+              <span className="text-sm text-muted-foreground">de {total} sesiones</span>
             </div>
-            <div className="text-sm text-slate-500 mt-1">{plan ? `Plan: ${plan.title}` : 'Plan de rehabilitación'}</div>
-            <div className="mt-3 w-full sm:w-72 h-2.5 rounded-full bg-slate-100 overflow-hidden">
-              <div className="h-full rounded-full bg-teal-500 transition-all duration-700" style={{ width: `${Math.min(100, pct)}%` }} />
+            <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted sm:max-w-sm">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-700 ease-out"
+                style={{ width: `${Math.min(100, pct)}%` }}
+              />
             </div>
+            <div className="mt-2 text-[11px] text-muted-foreground">{pct}% del plan completado</div>
           </div>
         </div>
-      </div>
+      </SectionCard>
 
       {/* Fuerza por grupo muscular */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex items-center gap-2 font-semibold text-slate-800">
-          <Dumbbell className="w-4 h-4 text-blue-600" /> Fuerza por grupo muscular
-        </div>
-        <p className="text-sm text-slate-500 mt-1 mb-3">Fuerza adquirida en cada sesión, por grupo muscular.</p>
+      <SectionCard icon={Dumbbell} title="Fuerza por grupo muscular" description="Fuerza adquirida en cada sesión, por grupo muscular.">
         <MuscleStrengthChart data={chartData} />
-      </div>
+      </SectionCard>
 
       {/* Movimientos lesivos */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex items-center gap-2 font-semibold text-slate-800">
-          <AlertTriangle className="w-4 h-4 text-amber-500" /> Movimientos lesivos
-        </div>
-        <p className="text-sm text-slate-500 mt-1 mb-3">Cantidad de movimientos lesivos registrados en cada sesión.</p>
+      <SectionCard icon={AlertTriangle} title="Movimientos lesivos" description="Cantidad de movimientos lesivos registrados en cada sesión.">
         <InjuriousMovementsChart data={chartData} />
-      </div>
+      </SectionCard>
 
       {/* Actividad muscular registrada con el wearable */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex items-center gap-2 font-semibold text-slate-800">
-          <Activity className="w-4 h-4 text-violet-600" /> Actividad muscular registrada
-        </div>
-        <p className="text-sm text-slate-500 mt-1 mb-3">
-          Índices máximos de actividad de cada grupo muscular en tus mediciones con el wearable.
-        </p>
+      <SectionCard
+        icon={Activity}
+        title="Actividad muscular registrada"
+        description="Índices máximos de actividad de cada grupo muscular en tus mediciones con el wearable."
+      >
         <MuscleActivitySummary sessions={measurementSessions} summaries={measurementSummaries} />
-      </div>
+      </SectionCard>
     </div>
   );
 }

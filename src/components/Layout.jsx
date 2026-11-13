@@ -1,11 +1,18 @@
 import React from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity } from 'lucide-react';
+import { Outlet, NavLink, useLocation, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import UserMenu from '@/components/UserMenu';
 import NavBadge from '@/components/NavBadge';
 import { usePatientBadges } from '@/hooks/usePatientBadges';
 import { PACIENTE_NAV, PROFESIONAL_NAV, AREA_LABELS } from '@/lib/navigation';
+
+const DETAIL_LABELS = [
+  { test: /^\/paciente\/sesion\//, label: 'Reporte de sesión' },
+  { test: /^\/kinesiologo\/paciente\/[^/]+\/sesion\/nueva/, label: 'Nueva sesión' },
+  { test: /^\/kinesiologo\/paciente\/[^/]+\/plan/, label: 'Plan de rehabilitación' },
+  { test: /^\/kinesiologo\/paciente\//, label: 'Ficha del paciente' },
+  { test: /^\/kinesiologo\/sesion\//, label: 'Detalle de sesión' },
+];
 
 export default function Layout() {
   const location = useLocation();
@@ -14,7 +21,13 @@ export default function Layout() {
   const areaLabel = AREA_LABELS[isKinesiologo ? 'professional' : 'patient'];
   const counts = usePatientBadges(!isKinesiologo);
 
-  const renderNavItems = (itemClass, iconClass) =>
+  const detail = DETAIL_LABELS.find((item) => item.test.test(location.pathname));
+  const activeItem = [...nav]
+    .sort((a, b) => b.to.length - a.to.length)
+    .find((item) => location.pathname === item.to || location.pathname.startsWith(`${item.to}/`));
+  const screenLabel = detail?.label || activeItem?.label || 'ReHabita';
+
+  const renderNavItems = () =>
     nav.map((item) => {
       const Icon = item.icon;
       return (
@@ -23,63 +36,83 @@ export default function Layout() {
           to={item.to}
           end={item.end}
           className={({ isActive }) =>
-            `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition ${itemClass(isActive)}`
+            `group relative flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] transition-colors ${
+              isActive
+                ? 'bg-brand-soft font-medium text-primary'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            }`
           }
         >
-          <Icon className={iconClass} />
-          {item.label}
-          {item.badgeKey && <NavBadge count={counts[item.badgeKey]} />}
+          {({ isActive }) => (
+            <>
+              {isActive && (
+                <span className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-full bg-brand-cyan" />
+              )}
+              <Icon className={`h-[17px] w-[17px] shrink-0 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
+              <span className="truncate">{item.label}</span>
+              {item.badgeKey && <NavBadge count={counts[item.badgeKey]} />}
+            </>
+          )}
         </NavLink>
       );
     });
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <Toaster position="top-right" />
 
       {/* Sidebar desktop */}
-      <aside className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:w-60 border-r border-slate-200 bg-white">
-        <div className="h-14 flex items-center gap-2 px-4 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
-            <Activity className="w-4 h-4 text-white" />
+      <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-[232px] md:flex-col border-r border-border bg-card">
+        <div className="px-5 pb-5 pt-6">
+          <Link to="/seleccionar-perfil" className="block" aria-label="ReHabita">
+            <img src="/brand/rehabita-logo-horizontal.png" alt="ReHabita" className="h-9 w-auto" />
+          </Link>
+          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-cyan" />
+            Área {areaLabel}
           </div>
-          <span className="font-semibold tracking-tight text-slate-900">ReHabita</span>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {renderNavItems(
-            (a) => (a ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'),
-            'w-4 h-4 shrink-0'
-          )}
-        </nav>
-        <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400">Área {areaLabel}</div>
+
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">{renderNavItems()}</nav>
+
+        <div className="border-t border-border px-5 py-4">
+          <p className="text-[10px] leading-relaxed text-muted-foreground">
+            El dispositivo registra · la plataforma traduce · vos interpretás.
+          </p>
+        </div>
       </aside>
 
       {/* Columna principal */}
-      <div className="md:pl-60 flex flex-col min-h-screen">
-        <header className="sticky top-0 z-30 bg-white border-b border-slate-200">
-          <div className="h-14 px-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="md:hidden w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
-                <Activity className="w-4 h-4 text-white" />
+      <div className="flex min-h-screen flex-col md:pl-[232px]">
+        <header className="sticky top-0 z-30 border-b border-border bg-card">
+          <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+            <div className="flex min-w-0 items-center gap-3">
+              <img
+                src="/brand/rehabita-logo-horizontal.png"
+                alt="ReHabita"
+                className="h-8 w-auto md:hidden"
+              />
+              <div className="hidden min-w-0 md:block">
+                <div className="eyebrow">Área {areaLabel}</div>
+                <div className="truncate font-heading text-sm font-semibold text-foreground">{screenLabel}</div>
               </div>
-              <span className="md:hidden font-semibold tracking-tight text-slate-900">ReHabita</span>
-              <span className="hidden md:inline text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                Área {areaLabel}
-              </span>
             </div>
-            <UserMenu />
+            <div className="flex items-center gap-3">
+              <span className="hidden rounded-full border border-border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground lg:inline-flex">
+                {areaLabel}
+              </span>
+              <span className="hidden h-6 w-px bg-border lg:block" />
+              <UserMenu />
+            </div>
           </div>
 
           {/* Nav mobile */}
-          <nav className="md:hidden flex items-center gap-1 px-3 h-12 overflow-x-auto border-t border-slate-100">
-            {renderNavItems(
-              (a) => (a ? 'bg-slate-100 text-slate-900 font-medium whitespace-nowrap' : 'text-slate-600 hover:text-slate-900 whitespace-nowrap'),
-              'w-4 h-4 shrink-0'
-            )}
+          <nav className="flex h-12 items-center gap-1 overflow-x-auto border-t border-border px-3 md:hidden">
+            {renderNavItems()}
           </nav>
         </header>
 
-        <main className="max-w-6xl w-full mx-auto px-4 py-6">
+        <main className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           <Outlet />
         </main>
       </div>

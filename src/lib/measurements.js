@@ -4,9 +4,9 @@ export const SAMPLE_STALE_MS = 6000;
 
 // Grupos musculares registrados por el wearable.
 export const MUSCLE_SERIES = [
-  { key: 'isquio', label: 'Isquiotibial', short: 'Isquio', color: '#7c3aed' },
-  { key: 'vasto_interno', label: 'Vasto interno', short: 'V. interno', color: '#0d9488' },
-  { key: 'vasto_externo', label: 'Vasto externo', short: 'V. externo', color: '#2563eb' },
+  { key: 'isquio', label: 'Isquiotibial', short: 'Isquio', color: '#9182FF' },
+  { key: 'vasto_interno', label: 'Vasto interno', short: 'V. interno', color: '#2CB1D2' },
+  { key: 'vasto_externo', label: 'Vasto externo', short: 'V. externo', color: '#22E2ED' },
 ];
 
 export const MEASUREMENT_STATE_LABELS = {

@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { PHASE_LABELS } from '@/lib/rehbaita';
-import { ArrowLeft, Save } from 'lucide-react';
+import PageHeader from '@/components/ds/PageHeader';
+import Card from '@/components/ds/Card';
+import Field from '@/components/ds/Field';
+import LoadingState from '@/components/ds/LoadingState';
+import { Button } from '@/components/ui/button';
+import { Save } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function RehabPlanEdit() {
@@ -59,61 +64,59 @@ export default function RehabPlanEdit() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando…</div>;
+  if (loading) return <LoadingState label="Cargando plan…" />;
   if (!patient) return null;
 
   return (
-    <div>
-      <Link to={`/kinesiologo/paciente/${patientId}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
-        <ArrowLeft className="w-4 h-4" /> Volver a la ficha
-      </Link>
-      <h1 className="text-xl font-semibold text-slate-900 mb-5">Plan de rehabilitación · {patient.full_name}</h1>
+    <div className="space-y-6">
+      <PageHeader
+        back={{ to: `/kinesiologo/paciente/${patientId}`, label: 'Volver a la ficha' }}
+        eyebrow="Plan de rehabilitación"
+        title={patient.full_name}
+        subtitle="Definí objetivos, etapa y duración del plan."
+      />
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-4 max-w-2xl">
-        <Field label="Título">
-          <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input" />
-        </Field>
-        <Field label="Descripción">
-          <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={2} className="input resize-none" />
-        </Field>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <Field label="Inicio">
-            <input type="date" value={form.start_date} onChange={e => setForm({ ...form, start_date: e.target.value })} className="input" />
+      <Card className="max-w-2xl p-5 sm:p-6">
+        <div className="space-y-5">
+          <Field label="Título">
+            <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input" />
           </Field>
-          <Field label="Objetivo de fin">
-            <input type="date" value={form.target_end_date} onChange={e => setForm({ ...form, target_end_date: e.target.value })} className="input" />
+          <Field label="Descripción">
+            <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={2} className="input resize-none" />
           </Field>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <Field label="Fase actual">
-            <select value={form.current_phase} onChange={e => setForm({ ...form, current_phase: e.target.value })} className="input">
-              {Object.entries(PHASE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Inicio">
+              <input type="date" value={form.start_date} onChange={e => setForm({ ...form, start_date: e.target.value })} className="input" />
+            </Field>
+            <Field label="Objetivo de fin">
+              <input type="date" value={form.target_end_date} onChange={e => setForm({ ...form, target_end_date: e.target.value })} className="input" />
+            </Field>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Fase actual">
+              <select value={form.current_phase} onChange={e => setForm({ ...form, current_phase: e.target.value })} className="input">
+                {Object.entries(PHASE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </Field>
+            <Field label="Estado">
+              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="input">
+                <option value="activo">Activo</option>
+                <option value="pausa">Pausa</option>
+                <option value="completado">Completado</option>
+              </select>
+            </Field>
+          </div>
+          <Field label="Objetivos">
+            <textarea value={form.goals} onChange={e => setForm({ ...form, goals: e.target.value })} rows={3} className="input resize-none" />
           </Field>
-          <Field label="Estado">
-            <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="input">
-              <option value="activo">Activo</option>
-              <option value="pausa">Pausa</option>
-              <option value="completado">Completado</option>
-            </select>
-          </Field>
-        </div>
-        <Field label="Objetivos">
-          <textarea value={form.goals} onChange={e => setForm({ ...form, goals: e.target.value })} rows={3} className="input resize-none" />
-        </Field>
-        <button onClick={save} disabled={saving} className="inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg bg-slate-900 text-white disabled:opacity-40">
-          <Save className="w-4 h-4" /> {saving ? 'Guardando…' : 'Guardar plan'}
-        </button>
-      </div>
-    </div>
-  );
-}
 
-function Field({ label, children }) {
-  return (
-    <div>
-      <label className="text-xs text-slate-500">{label}</label>
-      <div className="mt-1">{children}</div>
+          <div className="border-t border-border pt-4">
+            <Button onClick={save} disabled={saving}>
+              <Save className="h-4 w-4" /> {saving ? 'Guardando…' : 'Guardar plan'}
+            </Button>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

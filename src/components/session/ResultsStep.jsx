@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sparkles, ArrowLeft, ArrowRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { METRIC_MAP, metricDelta } from '@/lib/rehbaita';
+import { Button } from '@/components/ui/button';
 
 const LIVE = ['symmetry', 'load_distribution', 'stability', 'knee_flexion_angle'];
 const REST = ['reaction_time', 'movement_control', 'strength', 'pain_perceived', 'confidence_perceived'];
@@ -19,17 +20,19 @@ export default function ResultsStep({ liveMetrics, prevMetrics, resultMetrics, s
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-sm text-slate-700">Indicadores registrados durante el ejercicio</div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
+        <div className="text-sm text-foreground">Indicadores registrados durante el ejercicio</div>
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {LIVE.map(k => <Mini key={k} k={k} value={liveMetrics[k]} />)}
         </div>
       </div>
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm text-slate-700">Resto de indicadores <span className="text-xs text-slate-400">· comparado con la sesión anterior</span></div>
-          <button onClick={simulate} className="text-sm inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:border-slate-300">
-            <Sparkles className="w-4 h-4 text-amber-500" /> Simular
-          </button>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <div className="text-sm text-foreground">
+            Resto de indicadores <span className="text-[11px] text-muted-foreground">· comparado con la sesión anterior</span>
+          </div>
+          <Button variant="outline" size="sm" onClick={simulate}>
+            <Sparkles className="h-4 w-4 text-brand-blue" /> Simular
+          </Button>
         </div>
         <div className="space-y-2">
           {REST.map(k => {
@@ -38,15 +41,15 @@ export default function ResultsStep({ liveMetrics, prevMetrics, resultMetrics, s
             const prev = prevMetrics ? prevMetrics[k] : null;
             const d = metricDelta(k, v !== '' && v != null ? Number(v) : null, prev);
             return (
-              <div key={k} className="rounded-xl border border-slate-200 bg-white p-3 flex items-center gap-3">
+              <div key={k} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
                 <div className="flex-1">
-                  <label className="text-xs text-slate-500">{m.label}</label>
+                  <label className="micro-label">{m.label}</label>
                   <input
                     type="number"
                     step="0.1"
                     value={v}
                     onChange={e => setResultMetrics(s => ({ ...s, [k]: e.target.value }))}
-                    className="w-full mt-0.5 text-sm rounded-lg border border-slate-200 px-2 py-1.5 focus:outline-none focus:border-slate-400"
+                    className="input mt-1 py-1.5"
                   />
                 </div>
                 <Compare delta={d} prev={prev} unit={m.unit} />
@@ -55,13 +58,13 @@ export default function ResultsStep({ liveMetrics, prevMetrics, resultMetrics, s
           })}
         </div>
       </div>
-      <div className="flex justify-between items-center pt-1">
-        <button onClick={onBack} className="text-sm text-slate-500 inline-flex items-center gap-1.5 hover:text-slate-900">
-          <ArrowLeft className="w-4 h-4" /> Atrás
-        </button>
-        <button onClick={onNext} className="text-sm px-4 py-2 rounded-lg bg-slate-900 text-white inline-flex items-center gap-1.5">
-          Continuar a comentario <ArrowRight className="w-4 h-4" />
-        </button>
+      <div className="flex items-center justify-between gap-3 pt-1">
+        <Button variant="ghost" size="sm" onClick={onBack}>
+          <ArrowLeft className="h-4 w-4" /> Atrás
+        </Button>
+        <Button onClick={onNext}>
+          Continuar a comentario <ArrowRight className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
@@ -70,11 +73,11 @@ export default function ResultsStep({ liveMetrics, prevMetrics, resultMetrics, s
 function Mini({ k, value }) {
   const m = METRIC_MAP[k];
   return (
-    <div className="rounded-lg bg-slate-50 p-2">
-      <div className="text-xs text-slate-500">{m.label}</div>
-      <div className="text-sm font-semibold text-slate-900">
+    <div className="rounded-xl bg-muted p-2.5">
+      <div className="text-[10px] text-muted-foreground">{m.label}</div>
+      <div className="mt-0.5 font-heading text-sm font-semibold text-foreground tabular-nums">
         {value != null ? Math.round(value * 10) / 10 : '—'}
-        {m.unit && <span className="text-xs text-slate-400 ml-1">{m.unit}</span>}
+        {m.unit && <span className="ml-0.5 text-[10px] font-medium text-muted-foreground">{m.unit}</span>}
       </div>
     </div>
   );
@@ -82,15 +85,15 @@ function Mini({ k, value }) {
 
 function Compare({ delta, prev, unit }) {
   if (!delta || prev == null) {
-    return <div className="w-28 text-right text-xs text-slate-400">Sin previa</div>;
+    return <div className="w-24 shrink-0 text-right text-[11px] text-muted-foreground">Sin previa</div>;
   }
   const Icon = delta.delta > 0 ? TrendingUp : delta.delta < 0 ? TrendingDown : Minus;
   return (
-    <div className={`w-28 text-right ${delta.improved ? 'text-emerald-600' : 'text-rose-600'}`}>
-      <div className="text-xs flex items-center justify-end gap-1">
-        <Icon className="w-3.5 h-3.5" /> {delta.delta > 0 ? '+' : ''}{delta.delta} {unit}
+    <div className={`w-24 shrink-0 text-right ${delta.improved ? 'text-primary' : 'text-amber-700'}`}>
+      <div className="flex items-center justify-end gap-1 text-[11px] font-medium">
+        <Icon className="h-3.5 w-3.5" /> {delta.delta > 0 ? '+' : ''}{delta.delta} {unit}
       </div>
-      <div className="text-xs text-slate-400">prev: {Math.round(prev * 10) / 10}</div>
+      <div className="text-[10px] text-muted-foreground">prev: {Math.round(prev * 10) / 10}</div>
     </div>
   );
 }

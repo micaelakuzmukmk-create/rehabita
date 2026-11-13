@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { METRICS, PHASE_LABELS } from '@/lib/rehbaita';
 import MetricChart from '@/components/MetricChart';
 import MetricCard from '@/components/MetricCard';
-import { ArrowLeft, FileText, MessageSquare } from 'lucide-react';
+import PageHeader from '@/components/ds/PageHeader';
+import SectionCard from '@/components/ds/SectionCard';
+import Chip from '@/components/ds/Chip';
+import LoadingState from '@/components/ds/LoadingState';
+import { Button } from '@/components/ui/button';
+import { FileText, MessageSquare } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -68,8 +73,8 @@ export default function SessionDetail() {
     }
   }
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando sesión…</div>;
-  if (!session) return <div className="text-sm text-slate-400">Sesión no encontrada</div>;
+  if (loading) return <LoadingState label="Cargando sesión…" />;
+  if (!session) return <div className="text-sm text-muted-foreground">Sesión no encontrada</div>;
 
   const sessionsAsc = [...allSessions].sort((a, b) => new Date(a.date) - new Date(b.date));
   const metricBySession = Object.fromEntries(allMetrics.map(m => [m.session_id, m]));
@@ -83,95 +88,94 @@ export default function SessionDetail() {
   const selectedExercises = (session.exercises || []).map(id => exercises.find(e => e.id === id)).filter(Boolean);
 
   return (
-    <div>
-      <Link to={`/kinesiologo/paciente/${session.patient_id}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
-        <ArrowLeft className="w-4 h-4" /> Volver a la ficha
-      </Link>
-
-      <div className="flex items-start justify-between mb-5">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">Sesión {session.session_number}</h1>
-          <div className="text-sm text-slate-500 mt-0.5">
-            {patient?.full_name} · {format(parseISO(session.date), "dd/MM/yyyy HH:mm")}
+    <div className="space-y-6">
+      <PageHeader
+        back={{ to: `/kinesiologo/paciente/${session.patient_id}`, label: 'Volver a la ficha' }}
+        eyebrow={patient?.full_name}
+        title={`Sesión ${session.session_number}`}
+        subtitle={format(parseISO(session.date), "dd/MM/yyyy HH:mm")}
+        actions={
+          <div className="flex items-center gap-2">
+            {session.phase && <Chip tone="primary">{PHASE_LABELS[session.phase]}</Chip>}
+            <Chip tone={session.status === 'completada' ? 'success' : 'warning'} dot>{session.status}</Chip>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {session.phase && <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">{PHASE_LABELS[session.phase]}</span>}
-          <span className={`text-xs px-2 py-1 rounded-full ${session.status === 'completada' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{session.status}</span>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <div className="text-sm font-medium text-slate-700 mb-3">Mediciones de la sesión</div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SectionCard icon={FileText} title="Mediciones de la sesión">
           {metrics ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
               {METRICS.map(m => <MetricCard key={m.key} metricKey={m.key} value={metrics[m.key]} />)}
             </div>
-          ) : <div className="text-sm text-slate-400">Sin mediciones</div>}
-        </div>
+          ) : <div className="text-sm text-muted-foreground">Sin mediciones</div>}
+        </SectionCard>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-sm font-medium text-slate-700">Comparativa entre sesiones</div>
-          </div>
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {METRICS.map(m => (
-              <button
-                key={m.key}
-                onClick={() => setCompare(c => c.includes(m.key) ? c.filter(x => x !== m.key) : [...c, m.key])}
-                className={`text-xs px-2 py-1 rounded-full border ${compare.includes(m.key) ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-500'}`}
-              >
-                {m.label}
-              </button>
-            ))}
+        <SectionCard icon={FileText} title="Comparativa entre sesiones">
+          <div className="mb-4 flex flex-wrap gap-1.5">
+            {METRICS.map(m => {
+              const active = compare.includes(m.key);
+              return (
+                <button
+                  key={m.key}
+                  onClick={() => setCompare(c => c.includes(m.key) ? c.filter(x => x !== m.key) : [...c, m.key])}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition-colors ${
+                    active
+                      ? 'border-secondary bg-secondary font-medium text-primary'
+                      : 'border-border text-muted-foreground hover:border-brand-lavender'
+                  }`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: active ? m.color : '#D8D6E2' }} />
+                  {m.label}
+                </button>
+              );
+            })}
           </div>
           <MetricChart data={chartData} metrics={METRICS.filter(m => compare.includes(m.key))} />
-        </div>
+        </SectionCard>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-4 mt-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <div className="text-sm font-medium text-slate-700 mb-3 flex items-center gap-1.5"><FileText className="w-4 h-4" /> Ejercicios y calibración</div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SectionCard icon={FileText} title="Ejercicios y calibración">
           {selectedExercises.length > 0 ? (
-            <ul className="space-y-1.5">
+            <ul className="space-y-2">
               {selectedExercises.map(ex => (
-                <li key={ex.id} className="text-sm text-slate-700">
-                  <span className="font-medium">{ex.name}</span> <span className="text-slate-400">· {ex.category}</span>
+                <li key={ex.id} className="flex items-center justify-between gap-3 rounded-xl bg-muted px-3.5 py-2.5 text-sm">
+                  <span className="font-medium text-foreground">{ex.name}</span>
+                  <span className="text-[11px] capitalize text-muted-foreground">{ex.category}</span>
                 </li>
               ))}
             </ul>
-          ) : <div className="text-sm text-slate-400">Sin ejercicios registrados</div>}
+          ) : <div className="text-sm text-muted-foreground">Sin ejercicios registrados</div>}
           {calibration && (
-            <div className="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-500">
+            <div className="mt-4 border-t border-border pt-3 text-[11px] text-muted-foreground">
               Calibración: simetría {Math.round(calibration.baseline_symmetry * 10) / 10}% · estabilidad {Math.round(calibration.baseline_stability * 10) / 10} · carga {Math.round(calibration.baseline_load * 10) / 10}%
             </div>
           )}
-        </div>
+        </SectionCard>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <div className="text-sm font-medium text-slate-700 mb-3 flex items-center gap-1.5"><MessageSquare className="w-4 h-4" /> Comentario de la sesión</div>
+        <SectionCard icon={MessageSquare} title="Comentario de la sesión">
           <textarea
             value={comment}
             onChange={e => setComment(e.target.value)}
             placeholder="Comentario manual para el paciente…"
             rows={3}
-            className="w-full text-sm rounded-lg border border-slate-200 p-3 focus:outline-none focus:border-slate-400 resize-none"
+            className="input resize-none"
           />
-          <button onClick={addComment} disabled={!comment.trim()} className="mt-2 text-sm px-3 py-2 rounded-lg bg-slate-900 text-white disabled:opacity-40">
+          <Button onClick={addComment} disabled={!comment.trim()} className="mt-3">
             Guardar comentario
-          </button>
+          </Button>
           {comments.length > 0 && (
-            <div className="mt-3 space-y-2">
+            <div className="mt-4 space-y-3">
               {comments.map(c => (
-                <div key={c.id} className="text-sm text-slate-700 border-t border-slate-100 pt-2">
-                  <div className="text-xs text-slate-400 mb-0.5">{format(parseISO(c.date), "dd/MM/yyyy HH:mm")}</div>
-                  {c.content}
+                <div key={c.id} className="border-t border-border pt-3">
+                  <div className="mb-0.5 text-[11px] text-muted-foreground">{format(parseISO(c.date), "dd/MM/yyyy HH:mm")}</div>
+                  <p className="text-sm leading-relaxed text-foreground">{c.content}</p>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </SectionCard>
       </div>
     </div>
   );

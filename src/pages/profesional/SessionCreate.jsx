@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
+import PageHeader from '@/components/ds/PageHeader';
+import Card from '@/components/ds/Card';
 import Stepper from '@/components/session/Stepper';
 import PatientStep from '@/components/session/PatientStep';
 import PhaseStep from '@/components/session/PhaseStep';
@@ -170,15 +171,17 @@ export default function SessionCreate() {
   }
 
   return (
-    <div>
-      <Link to={`/kinesiologo/paciente/${patientId}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 mb-4">
-        <ArrowLeft className="w-4 h-4" /> Volver a la ficha
-      </Link>
-      <h1 className="text-xl font-semibold text-slate-900">Nueva sesión · {patient.full_name}</h1>
+    <div className="space-y-5">
+      <PageHeader
+        back={{ to: `/kinesiologo/paciente/${patientId}`, label: 'Volver a la ficha' }}
+        eyebrow="Nueva sesión"
+        title={patient.full_name}
+        subtitle="Flujo guiado de medición y registro de la sesión."
+      />
       <Stepper labels={STEP_LABELS} current={step} />
-      <div className="rounded-xl border border-slate-200 bg-white p-5">
+      <Card className="p-5 sm:p-6">
         {content}
-      </div>
+      </Card>
     </div>
   );
 }

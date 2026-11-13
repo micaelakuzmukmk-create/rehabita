@@ -5,6 +5,11 @@ import MeasurementSessionList from '@/components/profesional/MeasurementSessionL
 import ActivityChart from '@/components/profesional/ActivityChart';
 import { loadTherapistPatients } from '@/lib/therapist';
 import { MUSCLE_SERIES, formatElapsed } from '@/lib/measurements';
+import PageHeader from '@/components/ds/PageHeader';
+import Card from '@/components/ds/Card';
+import Chip from '@/components/ds/Chip';
+import LoadingState from '@/components/ds/LoadingState';
+import EmptyState from '@/components/ds/EmptyState';
 import { Activity } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -90,45 +95,35 @@ export default function Seguimiento() {
 
   const toggleSeries = (key) => setVisible((v) => ({ ...v, [key]: !v[key] }));
 
-  if (loading) return <div className="text-sm text-slate-400">Cargando…</div>;
+  if (loading) return <LoadingState label="Cargando seguimiento…" />;
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center gap-2">
-        <Activity className="w-5 h-5 text-slate-500" />
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">Seguimiento</h1>
-          <p className="text-sm text-slate-500">Actividad muscular registrada por el wearable, sesión por sesión.</p>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        eyebrow="Área Kinesiólogo"
+        title="Seguimiento"
+        subtitle="Actividad muscular registrada por el wearable, sesión por sesión."
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-1 space-y-4">
-          <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-1">
+          <Card className="p-4 sm:p-5">
             <PatientSelector patients={patients} value={patientId} onChange={setPatientId} />
-          </div>
+          </Card>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4">
-            <div className="text-sm font-medium text-slate-700 mb-3">Sesiones de medición</div>
+          <Card className="p-4 sm:p-5">
+            <h2 className="section-title mb-3">Sesiones de medición</h2>
             <MeasurementSessionList sessions={sessions} selectedId={selectedId} onSelect={setSelectedId} />
-          </div>
+          </Card>
         </div>
 
         <div className="lg:col-span-2">
-          <div className="rounded-xl border border-slate-200 bg-white p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                Actividad muscular
-                {selected?.status === 'activa' && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    En vivo
-                  </span>
-                )}
-                {selected?.simulated !== false && selected && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                    Datos simulados
-                  </span>
-                )}
+          <Card className="p-4 sm:p-5">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="section-title">Actividad muscular</span>
+                {selected?.status === 'activa' && <Chip tone="success" dot>En vivo</Chip>}
+                {selected?.simulated !== false && selected && <Chip tone="warning">Datos simulados</Chip>}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {MUSCLE_SERIES.map((s) => (
@@ -136,13 +131,15 @@ export default function Seguimiento() {
                     key={s.key}
                     type="button"
                     onClick={() => toggleSeries(s.key)}
-                    className={`text-[11px] px-2.5 py-1 rounded-full border transition ${
-                      visible[s.key] ? 'text-slate-900 border-slate-300 bg-slate-50' : 'text-slate-400 border-slate-200'
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition-colors ${
+                      visible[s.key]
+                        ? 'border-secondary bg-secondary font-medium text-primary'
+                        : 'border-border text-muted-foreground hover:border-brand-lavender'
                     }`}
                   >
                     <span
-                      className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle"
-                      style={{ backgroundColor: visible[s.key] ? s.color : '#cbd5e1' }}
+                      className="inline-block h-1.5 w-1.5 rounded-full"
+                      style={{ backgroundColor: visible[s.key] ? s.color : '#D8D6E2' }}
                     />
                     {s.short}
                   </button>
@@ -151,19 +148,21 @@ export default function Seguimiento() {
             </div>
 
             {!selected ? (
-              <div className="text-sm text-slate-400 py-16 text-center">
-                Seleccioná una sesión para ver sus curvas de actividad.
-              </div>
+              <EmptyState
+                icon={Activity}
+                title="Sin sesión seleccionada"
+                description="Seleccioná una sesión para ver sus curvas de actividad."
+              />
             ) : loadingSamples ? (
-              <div className="text-sm text-slate-400 py-16 text-center">Cargando muestras…</div>
+              <div className="py-16 text-center text-sm text-muted-foreground">Cargando muestras…</div>
             ) : chartData.length === 0 ? (
-              <div className="text-sm text-slate-400 py-16 text-center">
+              <div className="py-16 text-center text-sm text-muted-foreground">
                 Esta sesión no tiene muestras registradas.
               </div>
             ) : (
               <ActivityChart data={chartData} visible={visible} />
             )}
-          </div>
+          </Card>
         </div>
       </div>
     </div>
