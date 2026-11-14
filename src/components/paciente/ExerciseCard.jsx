@@ -1,8 +1,7 @@
 import React from 'react';
 import { Play } from 'lucide-react';
 import Chip from '@/components/ds/Chip';
-import ExerciseFigure from '@/components/paciente/exercise/ExerciseFigure';
-import { motionKeyFor } from '@/lib/exerciseMotions';
+import ExerciseAnimation from '@/components/exercises/ExerciseAnimation';
 import useFigureGender from '@/hooks/useFigureGender';
 
 const DIFFICULTY = { baja: 'Baja', media: 'Media', alta: 'Alta' };
@@ -29,7 +28,7 @@ export default function ExerciseCard({ exercise, onOpen }) {
 
       {/* Miniatura animada: la misma representación que verá al abrir la guía */}
       <div className="h-[78px] w-[62px] shrink-0 overflow-hidden rounded-xl bg-area-soft/50">
-        <ExerciseFigure motion={motionKeyFor(exercise)} gender={gender} />
+        <ExerciseAnimation name={exercise.name} gender={gender} fitting="cover" compact />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Pause, Play, RotateCcw, X } from 'lucide-react';
-import ExerciseFigure from './exercise/ExerciseFigure';
+import ExerciseAnimation from '@/components/exercises/ExerciseAnimation';
 import FigureGenderToggle from './FigureGenderToggle';
 import Chip from '@/components/ds/Chip';
 import { Button } from '@/components/ui/button';
@@ -65,7 +65,7 @@ export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
         <div className="relative mt-4 bg-gradient-to-b from-white to-area-soft/60 px-3 py-4">
           <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-1.5">
             <span className="rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-area-ink shadow-sm">
-              {cfg.label}
+              {exercise.name}
             </span>
           </div>
           <div className="absolute right-4 top-4 z-10">
@@ -75,12 +75,12 @@ export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
           </div>
 
           <div className="h-[292px] w-full sm:h-[330px]">
-            <ExerciseFigure
-              motion={motionKey}
+            <ExerciseAnimation
+              name={exercise.name}
+              gender={gender}
               playing={playing}
               restartKey={restartKey}
               speed={speed}
-              gender={gender}
             />
           </div>
           <div className="relative mt-1 text-center text-[11px] font-medium text-muted-foreground">
