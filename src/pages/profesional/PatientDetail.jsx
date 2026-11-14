@@ -9,6 +9,7 @@ import Card from '@/components/ds/Card';
 import Chip from '@/components/ds/Chip';
 import Tabs from '@/components/ds/Tabs';
 import MetricHero from '@/components/ds/MetricHero';
+import PatientFeedbackList from '@/components/profesional/PatientFeedbackList';
 import DataList from '@/components/ds/DataList';
 import LoadingState from '@/components/ds/LoadingState';
 import EmptyState from '@/components/ds/EmptyState';
@@ -353,6 +354,8 @@ export default function PatientDetail() {
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{c.content}</p>
             </Card>
           ))}
+
+          <PatientFeedbackList patientId={patientId} />
         </div>
       )}
     </div>

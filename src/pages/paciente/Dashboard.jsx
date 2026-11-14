@@ -32,7 +32,7 @@ export default function PatientDashboard() {
   const [perceptions, setPerceptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pain, setPain] = useState(3);
-  const [confidence, setConfidence] = useState(60);
+  const [confidence, setConfidence] = useState(7);
   const [perceptionNote, setPerceptionNote] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -132,17 +132,20 @@ export default function PatientDashboard() {
 
   const secondaryVitals = SECONDARY_KEYS.map((k) => {
     const m = METRIC_MAP[k];
-    const val = lastM?.[k];
-    const d = val != null ? metricDelta(k, val, prev?.[k]) : null;
-    const unit = k === 'knee_flexion_angle' ? '°' : k === 'pain_perceived' ? '/10' : '%';
+    const raw = lastM?.[k];
+    const prevRaw = prev?.[k];
+    const d = raw != null ? metricDelta(k, raw, prevRaw) : null;
+    // Confianza: se expresa en la misma escala 0-10 que usa el paciente en su devolución.
+    const toScale = (v) => (v == null ? null : k === 'confidence_perceived' ? Math.round((v / 10) * 10) / 10 : round1(v));
+    const unit = k === 'knee_flexion_angle' ? '°' : k === 'pain_perceived' || k === 'confidence_perceived' ? '/10' : '%';
     return {
       label: m.label.replace(' percibida', '').replace(' percibido', '').replace('Ángulo ', ''),
-      value: round1(val),
-      unit: val == null ? '' : unit,
-      delta: d?.delta ?? null,
-      deltaUnit: val == null ? '' : ` ${unit}`,
+      value: toScale(raw),
+      unit: raw == null ? '' : unit,
+      delta: d?.delta != null ? (k === 'confidence_perceived' ? Math.round((d.delta / 10) * 10) / 10 : d.delta) : null,
+      deltaUnit: raw == null ? '' : ` ${unit}`,
       improved: d?.improved,
-      hint: qualitative(k, val),
+      hint: qualitative(k, raw),
     };
   });
 
@@ -304,18 +307,18 @@ export default function PatientDashboard() {
           <div>
             <div className="mb-1.5 flex items-center justify-between">
               <span className="text-[13px] text-muted-foreground">Confianza corporal</span>
-              <span className="font-heading text-sm font-semibold text-foreground tabular-nums">{confidence}/100</span>
+              <span className="font-heading text-sm font-semibold text-foreground tabular-nums">{confidence}/10</span>
             </div>
             <input
               type="range"
               min={0}
-              max={100}
-              step={5}
+              max={10}
+              step={1}
               value={confidence}
               onChange={e => setConfidence(Number(e.target.value))}
               className="w-full accent-primary"
             />
-            <div className="mt-1 text-[11px] text-muted-foreground">{qualitative('confidence_perceived', confidence)}</div>
+            <div className="mt-1 text-[11px] text-muted-foreground">{qualitative('confidence_perceived', confidence * 10)}</div>
           </div>
         </div>
         <textarea
