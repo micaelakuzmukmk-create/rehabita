@@ -53,6 +53,14 @@
     --chart-4: 192 65% 50%;
     --chart-5: 192 65% 72%;
 
+    /* Estados clínicos: sobrios, solo para puntuar información */
+    --success: 158 52% 30%;
+    --success-soft: 152 52% 96%;
+    --warning: 32 76% 34%;
+    --warning-soft: 38 92% 96%;
+    --danger: 350 66% 44%;
+    --danger-soft: 350 90% 97%;
+
     --radius: 1rem;
 
     --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
@@ -107,6 +115,13 @@
     --chart-4: 192 65% 72%;
     --chart-5: 247 60% 60%;
 
+    --success: 152 45% 62%;
+    --success-soft: 158 28% 16%;
+    --warning: 36 78% 62%;
+    --warning-soft: 32 32% 16%;
+    --danger: 350 70% 66%;
+    --danger-soft: 350 32% 17%;
+
     --sidebar-background: 258 28% 10%;
     --sidebar-foreground: 250 14% 75%;
     --sidebar-primary: 247 100% 76%;
@@ -146,8 +161,20 @@
     @apply rounded-2xl border border-border bg-muted;
   }
 
+  /* Detalle de identidad: línea fina violeta → lavanda → cian */
+  .brand-hairline {
+    height: 2px;
+    border-radius: 999px;
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--brand-violet)) 0%,
+      hsl(var(--brand-lavender)) 48%,
+      hsl(var(--brand-cyan)) 100%
+    );
+  }
+
   .page-title {
-    @apply font-heading text-[24px] sm:text-[28px] font-semibold leading-tight tracking-tight text-foreground;
+    @apply font-heading text-[25px] sm:text-[30px] font-semibold leading-[1.15] tracking-[-0.02em] text-foreground;
   }
 
   .page-sub {
@@ -163,7 +190,7 @@
   }
 
   .metric-value {
-    @apply font-heading text-[32px] font-semibold leading-none tracking-tight text-foreground tabular-nums;
+    @apply font-heading text-[34px] font-semibold leading-none tracking-[-0.02em] text-foreground tabular-nums;
   }
 
   .metric-unit {
@@ -179,7 +206,7 @@
   }
 
   .input {
-    @apply w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground transition placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring disabled:bg-muted disabled:text-muted-foreground;
+    @apply w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground transition placeholder:text-muted-foreground focus:border-brand-lavender focus:outline-none focus:ring-2 focus:ring-brand-lavender/30 disabled:bg-muted disabled:text-muted-foreground;
   }
 
   .divider {

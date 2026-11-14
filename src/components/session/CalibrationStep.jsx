@@ -43,7 +43,7 @@ export default function CalibrationStep({ calibration, setCalibration, onBack, o
               <Base label="Estabilidad base" value={calibration.baseline_stability} unit="" />
               <Base label="Carga base" value={calibration.baseline_load} unit="%" />
             </div>
-            <div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+            <div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-success">
               <Check className="h-3.5 w-3.5" /> Calibración exitosa
             </div>
           </div>

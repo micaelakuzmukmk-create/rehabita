@@ -13,8 +13,8 @@ const UserNotRegisteredError = () => {
         <div className="text-center">
           <img src="/brand/rehabita-logo-horizontal.png" alt="ReHabita" className="mx-auto h-9 w-auto" />
 
-          <div className="mb-5 mt-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50">
-            <AlertTriangle className="h-7 w-7 text-amber-600" />
+          <div className="mb-5 mt-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-warning-soft">
+            <AlertTriangle className="h-7 w-7 text-warning" />
           </div>
 
           <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground">Acceso restringido</h1>

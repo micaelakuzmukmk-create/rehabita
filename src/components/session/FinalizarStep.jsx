@@ -8,7 +8,7 @@ const LIVE = ['symmetry', 'load_distribution', 'stability', 'knee_flexion_angle'
 export default function FinalizarStep({ liveMetrics, durationSec, onBack, onNext }) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-[13px] text-emerald-700">
+      <div className="flex items-center gap-2 rounded-xl border border-success/20 bg-success-soft px-4 py-3 text-[13px] text-success">
         <CheckCircle2 className="h-4 w-4" /> Medición registrada · duración {fmt(durationSec)}
       </div>
       <div className="grid gap-2.5 sm:grid-cols-2">

@@ -32,14 +32,14 @@ module.exports = {
   				900: '#26233A'
   			},
   			brand: {
-  				DEFAULT: 'hsl(var(--brand-violet))',
-  				violet: 'hsl(var(--brand-violet))',
-  				lavender: 'hsl(var(--brand-lavender))',
-  				cyan: 'hsl(var(--brand-cyan))',
-  				sky: 'hsl(var(--brand-sky))',
-  				blue: 'hsl(var(--brand-blue))',
-  				soft: 'hsl(var(--brand-soft))',
-  				mist: 'hsl(var(--brand-mist))',
+  				DEFAULT: 'hsl(var(--brand-violet) / <alpha-value>)',
+  				violet: 'hsl(var(--brand-violet) / <alpha-value>)',
+  				lavender: 'hsl(var(--brand-lavender) / <alpha-value>)',
+  				cyan: 'hsl(var(--brand-cyan) / <alpha-value>)',
+  				sky: 'hsl(var(--brand-sky) / <alpha-value>)',
+  				blue: 'hsl(var(--brand-blue) / <alpha-value>)',
+  				soft: 'hsl(var(--brand-soft) / <alpha-value>)',
+  				mist: 'hsl(var(--brand-mist) / <alpha-value>)',
   				line: 'hsl(var(--border))'
   			},
   			background: 'hsl(var(--background))',
@@ -71,6 +71,18 @@ module.exports = {
   			destructive: {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
+  			},
+  			success: {
+  				DEFAULT: 'hsl(var(--success) / <alpha-value>)',
+  				soft: 'hsl(var(--success-soft) / <alpha-value>)'
+  			},
+  			warning: {
+  				DEFAULT: 'hsl(var(--warning) / <alpha-value>)',
+  				soft: 'hsl(var(--warning-soft) / <alpha-value>)'
+  			},
+  			danger: {
+  				DEFAULT: 'hsl(var(--danger) / <alpha-value>)',
+  				soft: 'hsl(var(--danger-soft) / <alpha-value>)'
   			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',

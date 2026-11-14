@@ -66,9 +66,9 @@ export default function MuscleActivitySummary({ sessions, summaries }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start gap-2.5 rounded-xl border border-amber-100 bg-amber-50 p-3.5">
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-        <p className="text-[11px] leading-relaxed text-amber-800">
+      <div className="flex items-start gap-2.5 rounded-xl border border-warning/20 bg-warning-soft p-3.5">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+        <p className="text-[11px] leading-relaxed text-warning">
           Datos simulados: los índices corresponden a señales generadas por el dispositivo y no a mediciones clínicas
           de fuerza muscular.
         </p>

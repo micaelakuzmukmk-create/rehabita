@@ -67,9 +67,9 @@ export default function PatientSessions() {
   const ICON_TONES = {
     primary: 'bg-secondary text-primary',
     cyan: 'bg-accent text-brand-blue',
-    danger: 'bg-rose-50 text-rose-600',
-    warning: 'bg-amber-50 text-amber-600',
-    success: 'bg-emerald-50 text-emerald-600',
+    danger: 'bg-danger-soft text-danger',
+    warning: 'bg-warning-soft text-warning',
+    success: 'bg-success-soft text-success',
   };
 
   const sessionDates = sessionsAsc.map(s => s.date);

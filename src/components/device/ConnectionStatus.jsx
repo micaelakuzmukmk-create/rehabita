@@ -43,8 +43,8 @@ export function ReceptionIndicator({ receiving, connected }) {
     );
   }
   return (
-    <div className={`flex items-center gap-2 text-[11px] ${receiving ? 'text-primary' : 'text-amber-700'}`}>
-      <span className={`h-2 w-2 rounded-full ${receiving ? 'bg-brand-cyan animate-pulse' : 'bg-amber-500'}`} />
+    <div className={`flex items-center gap-2 text-[11px] ${receiving ? 'text-primary' : 'text-warning'}`}>
+      <span className={`h-2 w-2 rounded-full ${receiving ? 'bg-brand-cyan animate-pulse' : 'bg-warning'}`} />
       {receiving ? (
         <>
           <Radio className="h-3.5 w-3.5" /> Recibiendo datos

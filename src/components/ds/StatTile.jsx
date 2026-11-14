@@ -45,7 +45,7 @@ export default function StatTile({
                   ? 'bg-muted text-muted-foreground'
                   : good
                     ? 'bg-accent text-primary'
-                    : 'bg-amber-50 text-amber-700'
+                    : 'bg-warning-soft text-warning'
               )}
             >
               <DeltaIcon className="h-3 w-3" />

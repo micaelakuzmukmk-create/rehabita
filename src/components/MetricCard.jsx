@@ -18,7 +18,7 @@ export default function MetricCard({ metricKey, value, delta }) {
       <div className="mt-2 flex flex-wrap items-center justify-between gap-1">
         <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{q}</span>
         {delta != null && (
-          <span className={`text-[10px] font-medium ${isGood ? 'text-primary' : 'text-amber-700'}`}>
+          <span className={`text-[10px] font-medium ${isGood ? 'text-primary' : 'text-warning'}`}>
             {delta > 0 ? '+' : ''}{Math.round(delta * 10) / 10}
           </span>
         )}

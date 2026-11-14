@@ -286,9 +286,9 @@ export default function DeviceConnection() {
       />
 
       {!supported && (
-        <div className="flex gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4">
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-800">
+        <div className="flex gap-3 rounded-xl border border-warning/20 bg-warning-soft p-4">
+          <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+          <div className="text-sm text-warning">
             <div className="font-medium">Este navegador no admite Web Bluetooth</div>
             <p className="mt-1">
               Abrí la aplicación con <span className="font-medium">Google Chrome en Android</span> sobre una conexión
@@ -368,16 +368,16 @@ export default function DeviceConnection() {
         )}
 
         {error && (
-          <div className="flex gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4">
-            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-            <div className="text-sm text-rose-800">{error}</div>
+          <div className="flex gap-3 rounded-xl border border-danger/20 bg-danger-soft p-4">
+            <AlertTriangle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
+            <div className="text-sm text-danger">{error}</div>
           </div>
         )}
 
         {notice && (
-          <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
-            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-            <div className="text-sm text-amber-800">{notice}</div>
+          <div className="flex gap-3 rounded-xl border border-warning/20 bg-warning-soft p-4">
+            <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+            <div className="text-sm text-warning">{notice}</div>
           </div>
         )}
 

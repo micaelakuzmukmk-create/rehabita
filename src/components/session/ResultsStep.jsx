@@ -89,7 +89,7 @@ function Compare({ delta, prev, unit }) {
   }
   const Icon = delta.delta > 0 ? TrendingUp : delta.delta < 0 ? TrendingDown : Minus;
   return (
-    <div className={`w-24 shrink-0 text-right ${delta.improved ? 'text-primary' : 'text-amber-700'}`}>
+    <div className={`w-24 shrink-0 text-right ${delta.improved ? 'text-primary' : 'text-warning'}`}>
       <div className="flex items-center justify-end gap-1 text-[11px] font-medium">
         <Icon className="h-3.5 w-3.5" /> {delta.delta > 0 ? '+' : ''}{delta.delta} {unit}
       </div>

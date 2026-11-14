@@ -65,7 +65,7 @@ export default function UserMenu() {
           Cambiar perfil
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-lg text-rose-600 focus:text-rose-700">
+        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-lg text-danger focus:text-danger">
           <LogOut className="mr-2 h-4 w-4" />
           Salir
         </DropdownMenuItem>

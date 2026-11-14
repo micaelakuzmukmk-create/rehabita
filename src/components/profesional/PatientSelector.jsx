@@ -19,7 +19,7 @@ export default function PatientSelector({ patients, value, onChange, disabled, h
       </select>
       {disabled && hint && <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>}
       {!disabled && patients.length === 0 && (
-        <p className="mt-1 text-[11px] text-amber-700">No tenés pacientes asignados.</p>
+        <p className="mt-1 text-[11px] text-warning">No tenés pacientes asignados.</p>
       )}
     </div>
   );

@@ -5,9 +5,9 @@ const TONES = {
   neutral: 'bg-muted text-muted-foreground border-border',
   primary: 'bg-secondary text-primary border-secondary',
   cyan: 'bg-accent text-accent-foreground border-accent',
-  success: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-  warning: 'bg-amber-50 text-amber-700 border-amber-100',
-  danger: 'bg-rose-50 text-rose-700 border-rose-100',
+  success: 'bg-success-soft text-success border-success/20',
+  warning: 'bg-warning-soft text-warning border-warning/20',
+  danger: 'bg-danger-soft text-danger border-danger/20',
 };
 
 export default function Chip({ tone = 'neutral', className, children, dot = false }) {
