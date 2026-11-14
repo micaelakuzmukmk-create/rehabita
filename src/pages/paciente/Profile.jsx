@@ -8,6 +8,8 @@ import { format, parseISO, differenceInYears } from 'date-fns';
 import toast from 'react-hot-toast';
 import { loadCurrentPatient } from '@/lib/currentPatient';
 import { elapsedSince } from '@/lib/format';
+import FigureGenderToggle from '@/components/paciente/FigureGenderToggle';
+import useFigureGender from '@/hooks/useFigureGender';
 
 const GENDER_LABELS = { masculino: 'Masculino', femenino: 'Femenino', otro: 'Otro' };
 const DEFAULT_INJURY = 'Ligamento cruzado anterior (LCA)';
@@ -17,6 +19,7 @@ export default function Profile() {
   const [rehabStart, setRehabStart] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { gender, setGender } = useFigureGender();
 
   useEffect(() => { load(); }, []);
 
@@ -126,6 +129,18 @@ export default function Profile() {
           </div>
         </Card>
       </div>
+
+      <Card className="p-5 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h2 className="section-title">Preferencia de visualización corporal</h2>
+            <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+              Elegí con qué silueta querés ver las animaciones de tus ejercicios.
+            </p>
+          </div>
+          <FigureGenderToggle gender={gender} onChange={setGender} />
+        </div>
+      </Card>
     </div>
   );
 }

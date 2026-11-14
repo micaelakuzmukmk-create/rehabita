@@ -7,8 +7,15 @@ import { MOTIONS } from '@/lib/exerciseMotions';
 /**
  * Escena animada del ejercicio: silueta con volumen + escenario propio
  * (step, banda, banco, camilla, base, máquina) según el nombre del ejercicio.
+ * La variante corporal (mujer / hombre) se elige por preferencia del paciente.
  */
-export default function ExerciseFigure({ motion = 'sentadilla', playing = true, restartKey = 0, speed = 1 }) {
+export default function ExerciseFigure({
+  motion = 'sentadilla',
+  playing = true,
+  restartKey = 0,
+  speed = 1,
+  gender = 'hombre',
+}) {
   const cfg = MOTIONS[motion] || MOTIONS.sentadilla;
   const dur = cfg.dur / speed;
   const svgRef = useRef(null);
@@ -19,14 +26,14 @@ export default function ExerciseFigure({ motion = 'sentadilla', playing = true, 
     if (!svg || typeof svg.pauseAnimations !== 'function') return;
     if (playing) svg.unpauseAnimations();
     else svg.pauseAnimations();
-  }, [playing, restartKey, motion, speed]);
+  }, [playing, restartKey, motion, speed, gender]);
 
   const work = cfg.view === 'front' && cfg.work === 'near' ? 'left' : cfg.work;
 
   return (
     <div className="flex h-full w-full items-center justify-center">
       <svg
-        key={`${restartKey}-${speed}`}
+        key={`${restartKey}-${speed}-${gender}`}
         ref={svgRef}
         viewBox={cfg.frame.vb}
         className="h-full w-full"
@@ -63,6 +70,7 @@ export default function ExerciseFigure({ motion = 'sentadilla', playing = true, 
             work={work}
             env={cfg.env}
             hip={cfg.frame.hip}
+            gender={gender}
           />
         ) : (
           <SilhouetteSide
@@ -72,6 +80,8 @@ export default function ExerciseFigure({ motion = 'sentadilla', playing = true, 
             splines={cfg.splines}
             work={work}
             hip={cfg.frame.hip}
+            gender={gender}
+            pad={!!cfg.pad}
           />
         )}
       </svg>

@@ -25,7 +25,8 @@ const STAND_REACH = DIM.thigh + DIM.shin;
 const kt = (n) => {
   if (n === 4) return [0, 0.34, 0.62, 1];
   if (n === 5) return [0, 0.26, 0.44, 0.66, 1];
-  return [0, 0.16, 0.32, 0.5, 0.72, 1];
+  if (n === 6) return [0, 0.16, 0.32, 0.5, 0.72, 1];
+  return Array.from({ length: n }, (_, i) => Number((i / (n - 1)).toFixed(3)));
 };
 const splines = (n) => Array.from({ length: n - 1 }, () => '0.42 0 0.58 1').join(';');
 
@@ -82,22 +83,23 @@ export const MOTIONS = {
   /* ── Sentadilla ───────────────────────────────────────────────── */
   sentadilla: build('sentadilla', {
     label: 'Vista lateral',
-    caption: 'Descenso y ascenso con flexión de cadera y rodillas',
-    dur: 4,
+    caption: 'Descenso parcial con flexión controlada de cadera y rodillas',
+    dur: 4.4,
     sym: true,
     steps: [
-      'De pie, pies al ancho de cadera y mirada al frente',
-      'Descenso llevando la cadera hacia atrás, con el pecho alto',
-      'Rodillas alineadas con los pies, peso repartido en la planta',
-      'Ascenso controlado empujando el piso hasta la posición inicial',
+      'De pie, pies al ancho de cadera, rodillas alineadas y mirada al frente',
+      'Iniciá el descenso llevando la cadera hacia atrás, con el pecho alto',
+      'Flexioná cadera y rodillas hasta la sentadilla parcial indicada',
+      'Sostené un instante y ascendé empujando el piso hasta la posición inicial',
     ],
-    arc: 'M 110 119 C 100 138 88 150 77 158',
+    arc: 'M 110 119 C 104 130 92 142 80 150',
     poses: [
-      S({ lean: 3 }),
-      S({ lean: 14, th: 30, kn: 44, sh: 26, el: 16 }),
-      S({ lean: 24, th: 50, kn: 74, sh: 54, el: 20 }),
-      S({ lean: 24, th: 50, kn: 74, sh: 54, el: 20 }),
-      S({ lean: 3 }),
+      S({ lean: 4, sh: 10, el: 14 }),
+      S({ lean: 12, th: 26, kn: 40, sh: 34, el: 22 }),
+      S({ lean: 22, th: 44, kn: 66, sh: 58, el: 26 }),
+      S({ lean: 22, th: 44, kn: 66, sh: 58, el: 26 }),
+      S({ lean: 10, th: 18, kn: 28, sh: 26, el: 16 }),
+      S({ lean: 4, sh: 10, el: 14 }),
     ],
   }),
 
@@ -262,20 +264,24 @@ export const MOTIONS = {
     frame: F_FRONT,
     work: 'both',
     label: 'Vista frontal',
-    caption: 'Desplazamiento lateral con vuelo y aterrizaje',
-    dur: 3,
+    caption: 'Salto lateral: impulso, vuelo, recepción y repetición al otro lado',
+    dur: 3.4,
+    arc: 'M 94 292 C 102 214 138 214 146 292',
     steps: [
-      'De pie, con las rodillas levemente flexionadas',
-      'Impulsate hacia un costado con ambos pies',
-      'Aterrizá con la rodilla alineada, amortiguando',
-      'Repetí el salto hacia el otro lado',
+      'De pie, con las rodillas levemente flexionadas y los pies al ancho de cadera',
+      'Impulsate hacia un costado con ambos pies, empujando el piso',
+      'En el aire mantené la rodilla alineada con el pie',
+      'Aterrizá amortiguando con la cadera hacia atrás y repetí hacia el otro lado',
     ],
     poses: [
-      F({ rx: -22, kneeL: -16, kneeR: 14, hipL: 10, hipR: -6 }),
-      F({ dy: -34, kneeL: -4, kneeR: 4, armL: 24, armR: -24 }),
-      F({ rx: 22, kneeL: -14, kneeR: 16, hipL: 6, hipR: -10 }),
-      F({ dy: -34, kneeL: -4, kneeR: 4, armL: 24, armR: -24 }),
-      F({ rx: -22, kneeL: -16, kneeR: 14, hipL: 10, hipR: -6 }),
+      F({ rx: -26, hipL: 16, hipR: -16, kneeL: -16, kneeR: 16, armL: 20, elbowL: 22, armR: -20, elbowR: 22 }),
+      F({ rx: -18, dy: -18, hipL: 6, hipR: -6, kneeL: -6, kneeR: 6, armL: 28, armR: -28 }),
+      F({ rx: 0, dy: -46, hipL: 8, hipR: -8, kneeL: -8, kneeR: 8, armL: 30, armR: -30 }),
+      F({ rx: 18, dy: -18, hipL: 6, hipR: -6, kneeL: -6, kneeR: 6, armL: 26, armR: -26 }),
+      F({ rx: 26, hipL: 16, hipR: -16, kneeL: -16, kneeR: 16, armL: 14, armR: -14, elbowL: 22, elbowR: 22 }),
+      F({ rx: 18, dy: -18, hipL: 6, hipR: -6, kneeL: -6, kneeR: 6, armL: 26, armR: -26 }),
+      F({ rx: 0, dy: -46, hipL: 8, hipR: -8, kneeL: -8, kneeR: 8, armL: 30, armR: -30 }),
+      F({ rx: -18, dy: -18, hipL: 6, hipR: -6, kneeL: -6, kneeR: 6, armL: 26, armR: -26 }),
     ],
   }),
 
@@ -347,22 +353,27 @@ export const MOTIONS = {
 
   /* ── Slides de rodilla ────────────────────────────────────────── */
   slides: build('slides', {
-    label: 'Vista lateral',
-    env: 'slider',
-    caption: 'Deslizamiento de la rodilla hacia adelante',
-    dur: 4,
+    label: 'Vista lateral · decúbito dorsal',
+    frame: F_SUPINE,
+    env: 'mat',
+    pad: true,
+    track: [200, 292],
+    auto: false,
+    caption: 'Deslizamiento del talón con flexión progresiva de la rodilla',
+    dur: 5,
     steps: [
-      'De pie sobre la superficie deslizante',
-      'Deslizá la rodilla hacia adelante sin despegar el talón',
-      'Llegá a la flexión máxima controlada',
-      'Volvé a la posición inicial empujando el piso',
+      'Acostado boca arriba, con la pierna extendida y el talón sobre la superficie deslizante',
+      'Deslizá el talón acercándolo hacia la cadera, sin despegar el pie',
+      'La rodilla se flexiona de forma progresiva y controlada',
+      'Volvé a estirar la rodilla hasta la posición inicial',
     ],
     poses: [
-      S({ lean: 6 }),
-      S({ lean: 12, th: 18, kn: 42, th2: -6, kn2: 20, sh: 26, el: 14, anchorX: 28 }),
-      S({ lean: 18, th: 26, kn: 62, th2: -10, kn2: 30, sh: 44, el: 18, anchorX: 58 }),
-      S({ lean: 18, th: 26, kn: 62, th2: -10, kn2: 30, sh: 44, el: 18, anchorX: 58 }),
-      S({ lean: 6 }),
+      S({ lean: -88, th: 90, kn: 2, th2: 90, kn2: 2, sh: 172, el: 4, sh2: 172, el2: 4 }),
+      S({ lean: -88, th: 111, kn: 45, th2: 90, kn2: 2, sh: 172, el: 4, sh2: 172, el2: 4 }),
+      S({ lean: -88, th: 133, kn: 90, th2: 90, kn2: 2, sh: 172, el: 4, sh2: 172, el2: 4 }),
+      S({ lean: -88, th: 143, kn: 112, th2: 90, kn2: 2, sh: 172, el: 4, sh2: 172, el2: 4 }),
+      S({ lean: -88, th: 133, kn: 90, th2: 90, kn2: 2, sh: 172, el: 4, sh2: 172, el2: 4 }),
+      S({ lean: -88, th: 90, kn: 2, th2: 90, kn2: 2, sh: 172, el: 4, sh2: 172, el2: 4 }),
     ],
   }),
 

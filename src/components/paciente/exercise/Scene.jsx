@@ -16,6 +16,26 @@ export default function Scene({ motion }) {
         <rect x="8" y={ground - 6} width={width - 16} height="16" rx="8" fill={SURFACE} stroke={LINE} strokeWidth="1.5" />
       )}
 
+      {/* Zona de deslizamiento del talón (slides de rodilla) */}
+      {env === 'mat' && motion.track && (
+        <g strokeLinecap="round" fill="none">
+          <line
+            x1={motion.track[0]}
+            y1={ground - 4}
+            x2={motion.track[1]}
+            y2={ground - 4}
+            stroke="hsl(var(--brand-cyan) / 0.45)"
+            strokeWidth="2"
+            strokeDasharray="2 7"
+          />
+          <path
+            d={`M ${motion.track[0] + 16} ${ground - 12} l -9 8 l 9 8`}
+            stroke="hsl(var(--brand-cyan) / 0.6)"
+            strokeWidth="2.2"
+          />
+        </g>
+      )}
+
       {env === 'step' && (
         <g>
           <rect x="52" y={ground - 40} width="118" height="40" rx="7" fill={SURFACE} stroke={EDGE} strokeWidth="1.5" />

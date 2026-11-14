@@ -27,6 +27,14 @@
         "otro"
       ]
     },
+    "figure_gender": {
+      "type": "string",
+      "enum": [
+        "mujer",
+        "hombre"
+      ],
+      "description": "Preferencia de silueta para las animaciones de ejercicios"
+    },
     "injury_date": {
       "type": "string",
       "format": "date",

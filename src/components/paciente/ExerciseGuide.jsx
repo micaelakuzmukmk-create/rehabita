@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Pause, Play, RotateCcw, X } from 'lucide-react';
 import ExerciseFigure from './exercise/ExerciseFigure';
+import FigureGenderToggle from './FigureGenderToggle';
 import Chip from '@/components/ds/Chip';
 import { Button } from '@/components/ui/button';
 import { motionKeyFor, MOTIONS } from '@/lib/exerciseMotions';
+import useFigureGender from '@/hooks/useFigureGender';
 
 const DIFFICULTY = { baja: 'Baja', media: 'Media', alta: 'Alta' };
 
@@ -11,6 +13,7 @@ export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
   const [playing, setPlaying] = useState(true);
   const [restartKey, setRestartKey] = useState(0);
   const [speed, setSpeed] = useState(1);
+  const { gender, setGender } = useFigureGender();
 
   useEffect(() => {
     if (!exercise) return undefined;
@@ -72,7 +75,13 @@ export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
           </div>
 
           <div className="h-[292px] w-full sm:h-[330px]">
-            <ExerciseFigure motion={motionKey} playing={playing} restartKey={restartKey} speed={speed} />
+            <ExerciseFigure
+              motion={motionKey}
+              playing={playing}
+              restartKey={restartKey}
+              speed={speed}
+              gender={gender}
+            />
           </div>
           <div className="relative mt-1 text-center text-[11px] font-medium text-muted-foreground">
             {cfg.caption}
@@ -89,19 +98,25 @@ export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
             <RotateCcw className="h-3.5 w-3.5" /> Repetir
           </Button>
 
-          <div className="ml-auto flex items-center gap-0.5 rounded-full border border-border p-0.5">
-            {[1, 0.5].map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setSpeed(s)}
-                className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
-                  speed === s ? 'bg-area-soft text-area-ink' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {s}x
-              </button>
-            ))}
+          <div className="ml-auto flex items-center gap-2.5">
+            <span className="hidden text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:inline">
+              Ver como
+            </span>
+            <FigureGenderToggle gender={gender} onChange={setGender} />
+            <div className="flex items-center gap-0.5 rounded-full border border-border p-0.5">
+              {[1, 0.5].map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSpeed(s)}
+                  className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+                    speed === s ? 'bg-area-soft text-area-ink' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {s}x
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
