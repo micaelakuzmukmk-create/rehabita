@@ -49,9 +49,18 @@ export const ANIMATION_ALIASES = {
  * Ejemplo: sentadilla_parcial: { mujer: 'https://…/sentadilla_parcial_mujer.mp4' }
  */
 export const EXERCISE_ANIMATIONS = {
-  sentadilla_parcial: {},
-  slides_rodilla: {},
-  saltos_laterales: {},
+  sentadilla_parcial: {
+    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/e21bda69d_Sentadilla_mujer.mp4',
+    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/62eea49d3_Sentadilla_hombre.mp4',
+  },
+  slides_rodilla: {
+    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/db9eae434_Slides_mujer.mp4',
+    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/9a738ce7b_Slides_hombre.mp4',
+  },
+  saltos_laterales: {
+    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/edfba5fba_Saltos_mujer.mp4',
+    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/fe78703a4_Saltos_hombre.mp4',
+  },
 };
 
 const SLUG_BY_ALIAS = Object.entries(ANIMATION_ALIASES).reduce((acc, [slug, aliases]) => {
