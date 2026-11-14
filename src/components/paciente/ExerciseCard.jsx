@@ -27,8 +27,8 @@ export default function ExerciseCard({ exercise, onOpen }) {
       <span aria-hidden="true" className="absolute left-0 top-4 h-9 w-[3px] rounded-r-full bg-area-accent" />
 
       {/* Portada estática: sin autoplay ni loop, solo el frame inicial */}
-      <div className="h-[78px] w-[62px] shrink-0 overflow-hidden rounded-xl bg-area-soft/50">
-        <ExercisePreview name={exercise.name} gender={gender} fitting="cover" compact />
+      <div className="h-[84px] w-[84px] shrink-0 overflow-hidden rounded-xl bg-area-soft/40">
+        <ExercisePreview name={exercise.name} gender={gender} fitting="fit" compact />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">

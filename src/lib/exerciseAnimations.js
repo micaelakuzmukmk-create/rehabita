@@ -50,16 +50,16 @@ export const ANIMATION_ALIASES = {
  */
 export const EXERCISE_ANIMATIONS = {
   sentadilla_parcial: {
-    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/e21bda69d_Sentadilla_mujer.mp4',
-    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/62eea49d3_Sentadilla_hombre.mp4',
+    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/8e5c2056b_Sentadilla_mujer.mp4',
+    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/d08bdd2c6_Sentadilla_hombre.mp4',
   },
   slides_rodilla: {
-    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/db9eae434_Slides_mujer.mp4',
-    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/9a738ce7b_Slides_hombre.mp4',
+    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/89dd2efac_Slides_mujer.mp4',
+    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/e1efdc937_Slides_hombre.mp4',
   },
   saltos_laterales: {
-    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/97c9ec36d_Saltos_mujer_v3.mp4',
-    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/43818bb2a_Saltos_hombre_v3.mp4',
+    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/f5084cd8e_Saltos_mujer.mp4',
+    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/809f3fcf8_Saltos_hombre.mp4',
   },
 };
 
@@ -69,16 +69,16 @@ export const EXERCISE_ANIMATIONS = {
  */
 export const EXERCISE_POSTERS = {
   sentadilla_parcial: {
-    mujer: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/12ea86890_generated_image.png',
-    hombre: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/b73728934_generated_image.png',
+    mujer: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/b2973dd43_generated_image.png',
+    hombre: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/bf25e0965_generated_image.png',
   },
   slides_rodilla: {
-    mujer: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/78dd6d1f8_generated_image.png',
-    hombre: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/9eb787b6e_generated_image.png',
+    mujer: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/f13a921cf_generated_image.png',
+    hombre: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/2e6460c86_generated_image.png',
   },
   saltos_laterales: {
-    mujer: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/b68011cde_generated_image.png',
-    hombre: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/cdcdca31c_generated_image.png',
+    mujer: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/4ecef238a_generated_image.png',
+    hombre: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/832cac85c_generated_image.png',
   },
 };
 

@@ -74,7 +74,7 @@ export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
             </span>
           </div>
 
-          <div className="h-[292px] w-full sm:h-[330px]">
+          <div className="aspect-video w-full overflow-hidden rounded-xl">
             <ExerciseAnimation
               name={exercise.name}
               gender={gender}
