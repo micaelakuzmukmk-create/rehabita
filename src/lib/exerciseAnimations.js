@@ -58,8 +58,27 @@ export const EXERCISE_ANIMATIONS = {
     hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/9a738ce7b_Slides_hombre.mp4',
   },
   saltos_laterales: {
-    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/72f945653_Saltos_mujer_v2.mp4',
-    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/38f13621d_Saltos_hombre_v2.mp4',
+    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/97c9ec36d_Saltos_mujer_v3.mp4',
+    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/43818bb2a_Saltos_hombre_v3.mp4',
+  },
+};
+
+/**
+ * Portadas estáticas (frame inicial representativo) para las vistas previas.
+ * Las miniaturas usan siempre estas imágenes: nunca un video en reproducción.
+ */
+export const EXERCISE_POSTERS = {
+  sentadilla_parcial: {
+    mujer: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/12ea86890_generated_image.png',
+    hombre: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/b73728934_generated_image.png',
+  },
+  slides_rodilla: {
+    mujer: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/78dd6d1f8_generated_image.png',
+    hombre: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/9eb787b6e_generated_image.png',
+  },
+  saltos_laterales: {
+    mujer: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/b68011cde_generated_image.png',
+    hombre: 'https://media.base44.com/images/public/6ab87cc4d91f4c040f179413/cdcdca31c_generated_image.png',
   },
 };
 
@@ -87,10 +106,11 @@ export function animationFileName(slug, gender) {
 export function resolveExerciseAnimation(exerciseName, gender) {
   const preference = gender === 'hombre' ? 'hombre' : 'mujer';
   const slug = animationSlugFor(exerciseName);
-  if (!slug) return { slug: null, gender: preference, fileName: null, url: null, available: false };
+  if (!slug) return { slug: null, gender: preference, fileName: null, url: null, poster: null, available: false };
 
   const fileName = animationFileName(slug, preference);
   const url = EXERCISE_ANIMATIONS[slug]?.[preference] || null;
+  const poster = EXERCISE_POSTERS[slug]?.[preference] || null;
 
-  return { slug, gender: preference, fileName, url, available: Boolean(url) };
+  return { slug, gender: preference, fileName, url, poster, available: Boolean(url) };
 }
