@@ -39,7 +39,7 @@ export default function Layout() {
           className={({ isActive }) =>
             `group relative flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-xl px-3 py-2.5 text-[13px] transition-colors ${
               isActive
-                ? 'bg-brand-soft font-semibold text-primary ring-1 ring-inset ring-brand-lavender/30'
+                ? 'bg-area-soft font-semibold text-area-ink ring-1 ring-inset ring-area-accent/25'
                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             }`
           }
@@ -47,9 +47,9 @@ export default function Layout() {
           {({ isActive }) => (
             <>
               {isActive && (
-                <span className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-full bg-brand-cyan" />
+                <span className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-full bg-area-accent" />
               )}
-              <Icon className={`h-[17px] w-[17px] shrink-0 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
+              <Icon className={`h-[17px] w-[17px] shrink-0 ${isActive ? 'text-area-ink' : 'text-slate-400'}`} />
               <span className="truncate">{item.label}</span>
               {item.badgeKey && <NavBadge count={counts[item.badgeKey]} />}
             </>
@@ -59,7 +59,7 @@ export default function Layout() {
     });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${isKinesiologo ? 'area-professional' : 'area-patient'}`}>
       <Toaster position="top-right" />
 
       {/* Sidebar desktop */}
@@ -68,8 +68,8 @@ export default function Layout() {
           <Link to="/seleccionar-perfil" className="block" aria-label="ReHabita">
             <img src="/brand/rehabita-logo-horizontal.png" alt="ReHabita" className="h-9 w-auto max-w-full" />
           </Link>
-          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-cyan" />
+          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-area-soft px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-area-ink">
+            <span className="h-1.5 w-1.5 rounded-full bg-area-accent" />
             Área {areaLabel}
           </div>
         </div>

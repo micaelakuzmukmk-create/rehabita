@@ -213,3 +213,17 @@
     @apply border-border;
   }
 }
+
+/* Identidad por área: mismo sistema visual, distinto acento dominante.
+   El violeta gobierna la clínica; el cian acompaña al paciente. */
+.area-professional {
+  --area-ink: 260 65% 29%;
+  --area-accent: 247 100% 76%;
+  --area-soft: 247 100% 97%;
+}
+
+.area-patient {
+  --area-ink: 192 65% 45%;
+  --area-accent: 183 85% 53%;
+  --area-soft: 183 85% 96%;
+}

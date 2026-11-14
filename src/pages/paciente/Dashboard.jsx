@@ -3,21 +3,25 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { METRIC_MAP, PHASE_LABELS, qualitative, metricDelta } from '@/lib/rehbaita';
 import EvolutionChart from '@/components/paciente/EvolutionChart';
+import BodyFigure from '@/components/paciente/BodyFigure';
+import PatientVitals from '@/components/paciente/PatientVitals';
+import PatientQuickLinks from '@/components/paciente/PatientQuickLinks';
 import PageHeader from '@/components/ds/PageHeader';
 import SectionCard from '@/components/ds/SectionCard';
 import MetricHero from '@/components/ds/MetricHero';
-import DataList from '@/components/ds/DataList';
 import SectionHead from '@/components/ds/SectionHead';
 import Chip from '@/components/ds/Chip';
 import LoadingState from '@/components/ds/LoadingState';
 import { Button } from '@/components/ui/button';
-import { Activity, ArrowUpRight, HeartPulse, MessageSquareQuote, Sparkles, Quote, ClipboardList } from 'lucide-react';
+import { Activity, ArrowUpRight, ArrowLeftRight, HeartPulse, MessageSquareQuote, Sparkles, Quote, ClipboardList } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
 
 const EVOLUTION_KEYS = ['symmetry', 'stability', 'knee_flexion_angle'];
-const CARD_KEYS = ['symmetry', 'stability', 'knee_flexion_angle', 'pain_perceived', 'confidence_perceived'];
 const SCORE_KEYS = ['symmetry', 'stability', 'confidence_perceived', 'movement_control', 'strength'];
+const SECONDARY_KEYS = ['confidence_perceived', 'pain_perceived', 'stability', 'knee_flexion_angle'];
+
+const round1 = (v) => (v == null ? '—' : Math.round(v * 10) / 10);
 
 export default function PatientDashboard() {
   const [patient, setPatient] = useState(null);
@@ -96,8 +100,8 @@ export default function PatientDashboard() {
   const lastM = last ? metricBySession[last.id] : null;
   const prev = sessionsAsc.length > 1 ? metricBySession[sessionsAsc[sessionsAsc.length - 2].id] : null;
   const currentSessionNumber = last?.session_number ?? sessions.length;
+  const totalSessions = plan?.total_sessions || null;
 
-  // progreso general: promedio normalizado (0-100) de métricas positivas de la última sesión
   const score = lastM
     ? Math.round(SCORE_KEYS.reduce((acc, k) => {
         const v = lastM[k]; const m = METRIC_MAP[k];
@@ -111,22 +115,34 @@ export default function PatientDashboard() {
       }, 0) / SCORE_KEYS.length)
     : null;
 
-  // comparación con sesión anterior
-  const comparable = CARD_KEYS.filter(k => lastM?.[k] != null && prev?.[k] != null);
+  const comparable = SECONDARY_KEYS.filter(k => lastM?.[k] != null && prev?.[k] != null);
   const improvedCount = comparable.filter(k => metricDelta(k, lastM[k], prev[k])?.improved).length;
 
-  // Nivel 2: todos los indicadores en una sola lista, con su variación al lado.
-  const indicatorRows = CARD_KEYS.map((k) => {
+  const symmetryDelta = lastM?.symmetry != null ? metricDelta('symmetry', lastM.symmetry, prev?.symmetry) : null;
+
+  const primaryVital = {
+    label: 'Simetría entre piernas',
+    value: round1(lastM?.symmetry),
+    unit: '%',
+    delta: symmetryDelta?.delta ?? null,
+    deltaUnit: ' %',
+    improved: symmetryDelta?.improved,
+    hint: lastM?.symmetry != null ? qualitative('symmetry', lastM.symmetry) : 'Sin registro',
+  };
+
+  const secondaryVitals = SECONDARY_KEYS.map((k) => {
     const m = METRIC_MAP[k];
     const val = lastM?.[k];
     const d = val != null ? metricDelta(k, val, prev?.[k]) : null;
+    const unit = k === 'knee_flexion_angle' ? '°' : k === 'pain_perceived' ? '/10' : '%';
     return {
-      label: m.label,
-      value: val == null ? '—' : `${Math.round(val * 10) / 10}${m.unit ? ` ${m.unit}` : ''}`,
-      hint: val == null ? 'Sin registro' : qualitative(k, val),
-      delta: d ? d.delta : null,
-      deltaUnit: m.unit ? ` ${m.unit}` : '',
-      improved: d ? d.improved : undefined,
+      label: m.label.replace(' percibida', '').replace(' percibido', '').replace('Ángulo ', ''),
+      value: round1(val),
+      unit: val == null ? '' : unit,
+      delta: d?.delta ?? null,
+      deltaUnit: val == null ? '' : ` ${unit}`,
+      improved: d?.improved,
+      hint: qualitative(k, val),
     };
   });
 
@@ -143,75 +159,91 @@ export default function PatientDashboard() {
   const olderComments = comments.slice(1);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <PageHeader
         eyebrow="Área Paciente"
         title={`Hola, ${patient.full_name.split(' ')[0]}`}
         subtitle={
-          <span>
-            Sesión <span className="font-medium text-foreground">Nº {currentSessionNumber}</span> · rehabilitación de rodilla {patient.injury_side}
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span>Tu recuperación · Sesión Nº {currentSessionNumber}{totalSessions ? ` de ${totalSessions}` : ''}</span>
+            <span className="text-slate-300">·</span>
+            <span>Rodilla {patient.injury_side}</span>
+            {plan?.current_phase && (
+              <>
+                <span className="text-slate-300">·</span>
+                <span className="font-medium text-foreground">{PHASE_LABELS[plan.current_phase]}</span>
+              </>
+            )}
           </span>
         }
       />
 
-      {/* Nivel 1: progreso general */}
-      <section className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-surface">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-28 -top-32 h-72 w-72 rounded-full bg-brand-soft blur-3xl" />
-        <div className="relative flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-8">
-          <MetricHero
-            label="Progreso general"
-            value={score}
-            unit="%"
-            delta={prevScore != null ? score - prevScore : null}
-            deltaUnit=" pts"
-            caption={prevScore != null ? 'vs. tu sesión anterior' : undefined}
-          />
-
-          <div className="h-px w-full shrink-0 bg-border sm:h-20 sm:w-px" />
-
-          <div className="min-w-0 flex-1">
-            <div className="eyebrow flex items-center gap-1.5">
-              <HeartPulse className="h-3.5 w-3.5 text-brand-cyan" /> Tu mensaje de hoy
+      {/* Nivel 1: cómo estoy */}
+      <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-surface">
+        <div className="grid gap-6 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-8 sm:p-7">
+          <div className="min-w-0">
+            <MetricHero
+              label="Progreso general"
+              value={score}
+              unit="%"
+              delta={prevScore != null ? score - prevScore : null}
+              deltaUnit=" pts"
+              caption={prevScore != null ? 'vs. tu sesión anterior' : undefined}
+            />
+            <div className="mt-5 flex items-start gap-2 border-t border-border pt-4">
+              <HeartPulse className="mt-0.5 h-4 w-4 shrink-0 text-area-accent" />
+              <p className="font-heading text-[14px] font-medium leading-snug text-foreground">{motivation}</p>
             </div>
-            <p className="mt-2 font-heading text-[15px] font-medium leading-snug text-foreground sm:text-base">{motivation}</p>
+          </div>
+
+          <div className="flex justify-center rounded-2xl bg-area-soft/70 px-4 py-3">
+            <BodyFigure side={patient.injury_side} className="h-36 sm:h-44" />
           </div>
         </div>
+      </section>
+
+      <PatientQuickLinks />
+
+      {/* Nivel 2 y 3: indicadores con dos escalas */}
+      <section>
+        <SectionHead
+          title="Tus indicadores"
+          description="El dato más importante de tu última sesión y el resto del contexto."
+          action={
+            comparable.length > 0 ? (
+              <span className="text-[11px] text-muted-foreground">
+                <span className="font-semibold text-area-ink">{improvedCount}</span> de {comparable.length} mejoraron
+              </span>
+            ) : undefined
+          }
+        />
+        <PatientVitals primary={primaryVital} secondary={secondaryVitals} />
       </section>
 
       {/* Evolución */}
       <SectionCard
         icon={Sparkles}
         title="Tu evolución"
-        description="Así vienen simetría, estabilidad y flexión sesión a sesión. No siempre es una línea recta: las mesetas y los pequeños descensos son parte del proceso."
+        description="Simetría, estabilidad y flexión sesión a sesión. No siempre es una línea recta: las mesetas y los pequeños descensos son parte del proceso."
+        action={
+          <Link
+            to="/paciente/comparar"
+            className="inline-flex items-center gap-1 text-[13px] font-medium text-area-ink hover:underline"
+          >
+            <ArrowLeftRight className="h-3.5 w-3.5" /> Comparar sesiones
+          </Link>
+        }
       >
         <EvolutionChart data={chartData} keys={EVOLUTION_KEYS} />
       </SectionCard>
 
-      {/* Nivel 2: indicadores agrupados, sin una tarjeta por dato */}
-      <section>
-        <SectionHead
-          title="Tus indicadores"
-          action={
-            comparable.length > 0 ? (
-              <span className="text-[11px] text-muted-foreground">
-                <span className="font-semibold text-primary">{improvedCount}</span> de {comparable.length} mejoraron
-              </span>
-            ) : undefined
-          }
-        />
-        <div className="rounded-2xl border border-border bg-card px-5 py-4 shadow-soft sm:px-6">
-          <DataList rows={indicatorRows} />
-        </div>
-      </section>
-
-      {/* Último comentario del kinesiólogo */}
       {latestComment && (
-        <div className="rounded-2xl border border-border bg-brand-mist p-5 sm:p-6">
-          <div className="eyebrow flex items-center gap-1.5 text-primary">
+        <div className="rounded-2xl border border-border bg-area-soft/60 p-5 sm:p-6">
+          <div className="eyebrow flex items-center gap-1.5 text-area-ink">
             <MessageSquareQuote className="h-3.5 w-3.5" /> Último comentario de tu kinesiólogo
           </div>
           <div className="mt-2.5 flex gap-2">
-            <Quote className="mt-0.5 h-4 w-4 shrink-0 text-brand-sky" />
+            <Quote className="mt-0.5 h-4 w-4 shrink-0 text-area-accent" />
             <div>
               <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">{latestComment.content}</p>
               <div className="mt-2 text-[11px] text-muted-foreground">{format(parseISO(latestComment.date), "dd/MM/yyyy")}</div>
@@ -220,7 +252,37 @@ export default function PatientDashboard() {
         </div>
       )}
 
-      {/* ¿Cómo te sentís hoy? */}
+      {plan && (
+        <SectionCard
+          icon={ClipboardList}
+          title="Tu plan de rehabilitación"
+          action={
+            <Link to="/paciente/plan" className="inline-flex items-center gap-1 text-[13px] font-medium text-area-ink hover:underline">
+              Ver plan <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          }
+        >
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="min-w-0">
+              <div className="text-sm font-medium text-foreground">{plan.title}</div>
+              {plan.description && <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{plan.description}</p>}
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-heading text-2xl font-semibold leading-none text-foreground tabular-nums">
+                {currentSessionNumber}
+              </span>
+              <span className="text-[11px] text-muted-foreground">/ {totalSessions || '—'} sesiones</span>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Chip tone="cyan">Etapa: {PHASE_LABELS[plan.current_phase]}</Chip>
+            <Chip tone="neutral" className="capitalize">{plan.status}</Chip>
+            {plan.target_end_date && <Chip tone="primary">Objetivo: {format(parseISO(plan.target_end_date), 'dd/MM/yyyy')}</Chip>}
+          </div>
+        </SectionCard>
+      )}
+
+      {/* Cómo te sentís hoy */}
       <SectionCard icon={Activity} title="¿Cómo te sentís hoy?" description="Registrá tu percepción para acompañar la lectura de tus datos.">
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
@@ -268,28 +330,11 @@ export default function PatientDashboard() {
         </Button>
       </SectionCard>
 
-      {/* Plan */}
-      {plan && (
-        <SectionCard
-          icon={ClipboardList}
-          title="Tu plan de rehabilitación"
-          action={<Link to="/paciente/plan" className="inline-flex items-center gap-1 text-[13px] font-medium text-primary hover:underline">Ver plan <ArrowUpRight className="h-3.5 w-3.5" /></Link>}
-        >
-          <div className="text-sm font-medium text-foreground">{plan.title}</div>
-          {plan.description && <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{plan.description}</p>}
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Chip tone="primary">Etapa: {PHASE_LABELS[plan.current_phase]}</Chip>
-            <Chip tone="neutral" className="capitalize">{plan.status}</Chip>
-            {plan.target_end_date && <Chip tone="cyan">Objetivo: {format(parseISO(plan.target_end_date), 'dd/MM/yyyy')}</Chip>}
-          </div>
-        </SectionCard>
-      )}
-
       {/* Sesiones recientes */}
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="section-title">Tus sesiones</h2>
-          <Link to="/paciente/sesiones" className="text-[13px] font-medium text-primary hover:underline">Ver todas</Link>
+          <Link to="/paciente/sesiones" className="text-[13px] font-medium text-area-ink hover:underline">Ver todas</Link>
         </div>
         <div className="space-y-2">
           {sessions.length === 0 && <div className="text-sm text-muted-foreground">Aún no hay sesiones</div>}
@@ -297,10 +342,10 @@ export default function PatientDashboard() {
             <Link
               key={s.id}
               to={`/paciente/sesion/${s.id}`}
-              className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3.5 transition-colors hover:border-brand-lavender"
+              className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3.5 transition-colors hover:border-area-accent/60"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-[13px] font-semibold text-primary">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-area-soft text-[13px] font-semibold text-area-ink">
                   {s.session_number ?? sessions.length - i}
                 </span>
                 <div>
@@ -314,7 +359,6 @@ export default function PatientDashboard() {
         </div>
       </section>
 
-      {/* Comentarios anteriores */}
       {olderComments.length > 0 && (
         <section>
           <h2 className="section-title mb-3">Comentarios anteriores</h2>

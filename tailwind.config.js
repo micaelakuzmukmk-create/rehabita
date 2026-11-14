@@ -31,6 +31,11 @@ module.exports = {
   				800: '#38344A',
   				900: '#26233A'
   			},
+  			area: {
+  				ink: 'hsl(var(--area-ink) / <alpha-value>)',
+  				accent: 'hsl(var(--area-accent) / <alpha-value>)',
+  				soft: 'hsl(var(--area-soft) / <alpha-value>)'
+  			},
   			brand: {
   				DEFAULT: 'hsl(var(--brand-violet) / <alpha-value>)',
   				violet: 'hsl(var(--brand-violet) / <alpha-value>)',
