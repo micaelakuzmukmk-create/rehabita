@@ -1,17 +1,18 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import SideFigure from './SideFigure';
-import FrontFigure from './FrontFigure';
-import { MOTIONS } from '@/lib/exerciseMotion';
+import React, { useEffect, useId, useRef } from 'react';
+import SilhouetteSide from './SilhouetteSide';
+import SilhouetteFront from './SilhouetteFront';
+import Scene from './Scene';
+import { MOTIONS } from '@/lib/exerciseMotions';
 
 /**
- * Figura humana de línea con movimiento real (SVG animado).
- * `playing` pausa/reanuda la línea de tiempo; `restartKey` reinicia el ciclo;
- * `speed` escala la duración del ciclo (0.5x / 1x).
+ * Escena animada del ejercicio: silueta con volumen + escenario propio
+ * (step, banda, banco, camilla, base, máquina) según el nombre del ejercicio.
  */
-export default function ExerciseFigure({ motion = 'squat', side = 'derecha', playing = true, restartKey = 0, speed = 1 }) {
-  const base = MOTIONS[motion] || MOTIONS.squat;
-  const cfg = useMemo(() => ({ ...base, dur: base.dur / speed }), [base, speed]);
+export default function ExerciseFigure({ motion = 'sentadilla', playing = true, restartKey = 0, speed = 1 }) {
+  const cfg = MOTIONS[motion] || MOTIONS.sentadilla;
+  const dur = cfg.dur / speed;
   const svgRef = useRef(null);
+  const uid = useId().replace(/[:]/g, '');
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -20,15 +21,60 @@ export default function ExerciseFigure({ motion = 'squat', side = 'derecha', pla
     else svg.pauseAnimations();
   }, [playing, restartKey, motion, speed]);
 
-  const figureKey = `${restartKey}-${speed}`;
+  const work = cfg.view === 'front' && cfg.work === 'near' ? 'left' : cfg.work;
 
   return (
     <div className="flex h-full w-full items-center justify-center">
-      {cfg.view === 'frontal' ? (
-        <FrontFigure key={figureKey} cfg={cfg} svgRef={svgRef} side={side} />
-      ) : (
-        <SideFigure key={figureKey} cfg={cfg} svgRef={svgRef} />
-      )}
+      <svg
+        key={`${restartKey}-${speed}`}
+        ref={svgRef}
+        viewBox={cfg.frame.vb}
+        className="h-full w-full"
+        preserveAspectRatio="xMidYMid meet"
+        role="img"
+        aria-label={`Animación del ejercicio: ${cfg.caption}`}
+      >
+        <defs>
+          <marker id={`arrow-${uid}`} viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(var(--brand-cyan) / 0.8)" />
+          </marker>
+        </defs>
+
+        <Scene motion={cfg} />
+
+        {cfg.arc && (
+          <path
+            d={cfg.arc}
+            fill="none"
+            stroke="hsl(var(--brand-cyan) / 0.75)"
+            strokeWidth="2.5"
+            strokeDasharray="7 7"
+            strokeLinecap="round"
+            markerEnd={`url(#arrow-${uid})`}
+          />
+        )}
+
+        {cfg.view === 'front' ? (
+          <SilhouetteFront
+            poses={cfg.poses}
+            dur={dur}
+            keyTimes={cfg.keyTimes}
+            splines={cfg.splines}
+            work={work}
+            env={cfg.env}
+            hip={cfg.frame.hip}
+          />
+        ) : (
+          <SilhouetteSide
+            poses={cfg.poses}
+            dur={dur}
+            keyTimes={cfg.keyTimes}
+            splines={cfg.splines}
+            work={work}
+            hip={cfg.frame.hip}
+          />
+        )}
+      </svg>
     </div>
   );
 }

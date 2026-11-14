@@ -3,7 +3,7 @@ import { Pause, Play, RotateCcw, X } from 'lucide-react';
 import ExerciseFigure from './exercise/ExerciseFigure';
 import Chip from '@/components/ds/Chip';
 import { Button } from '@/components/ui/button';
-import { motionForCategory, MOTIONS } from '@/lib/exerciseMotion';
+import { motionKeyFor, MOTIONS } from '@/lib/exerciseMotions';
 
 const DIFFICULTY = { baja: 'Baja', media: 'Media', alta: 'Alta' };
 
@@ -28,8 +28,8 @@ export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
 
   if (!exercise) return null;
 
-  const motionKey = motionForCategory(exercise.category);
-  const cfg = MOTIONS[motionKey];
+  const motionKey = motionKeyFor(exercise);
+  const cfg = MOTIONS[motionKey] || MOTIONS.sentadilla;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/45 backdrop-blur-sm sm:items-center sm:p-6">
@@ -62,7 +62,7 @@ export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
         <div className="relative mt-4 bg-gradient-to-b from-white to-area-soft/60 px-3 py-4">
           <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-1.5">
             <span className="rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-area-ink shadow-sm">
-              {cfg.viewLabel}
+              {cfg.label}
             </span>
           </div>
           <div className="absolute right-4 top-4 z-10">
@@ -72,7 +72,10 @@ export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
           </div>
 
           <div className="h-[292px] w-full sm:h-[330px]">
-            <ExerciseFigure motion={motionKey} side={side} playing={playing} restartKey={restartKey} speed={speed} />
+            <ExerciseFigure motion={motionKey} playing={playing} restartKey={restartKey} speed={speed} />
+          </div>
+          <div className="relative mt-1 text-center text-[11px] font-medium text-muted-foreground">
+            {cfg.caption}
           </div>
         </div>
 
