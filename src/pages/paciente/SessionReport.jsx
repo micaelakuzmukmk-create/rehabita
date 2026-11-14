@@ -7,6 +7,7 @@ import PageHeader from '@/components/ds/PageHeader';
 import SectionCard from '@/components/ds/SectionCard';
 import Card from '@/components/ds/Card';
 import StatTile from '@/components/ds/StatTile';
+import SessionFeedback from '@/components/paciente/SessionFeedback';
 import LoadingState from '@/components/ds/LoadingState';
 import { Activity, HeartPulse, TrendingUp, MessageSquare, Sparkles } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
@@ -138,6 +139,8 @@ export default function PatientSessionReport() {
           </div>
         </section>
       )}
+
+      <SessionFeedback sessionId={session.id} patientId={session.patient_id} />
     </div>
   );
 }

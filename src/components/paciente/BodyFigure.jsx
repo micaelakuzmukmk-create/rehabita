@@ -1,65 +1,75 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { FRONT, FIGURE_COLORS as C } from '@/lib/bodyPaths';
 
 /**
- * Esquema corporal técnico (no anatómico): ubica la rodilla trabajada
- * y el lado lesionado sin depender de imágenes externas.
+ * Esquema corporal estático (figura de línea, vista frontal) con la rodilla
+ * del lado lesionado destacada. Sin datos clínicos: solo ubica la zona.
  */
-export default function BodyFigure({ side = 'derecha', className, animated = true, showLabel = true }) {
+export default function BodyFigure({ side = 'derecha', className, showLabel = true }) {
   const isLeft = String(side).toLowerCase().startsWith('i');
-  const affectedKnee = isLeft ? { x: 76, y: 148 } : { x: 44, y: 148 };
-  const healthyLeg = isLeft ? 'M60 96 L 44 148 L 40 202' : 'M60 96 L 76 148 L 80 202';
-  const affectedLeg = isLeft ? 'M60 96 L 76 148 L 80 202' : 'M60 96 L 44 148 L 40 202';
+  const kneeX = isLeft ? -16 : 16;
 
   return (
-    <svg
-      viewBox="0 0 120 224"
-      className={cn('h-full w-auto', className)}
-      role="img"
-      aria-label={`Esquema corporal · rodilla ${side}`}
-    >
-      {/* Referencia de piso */}
-      <line x1="18" y1="206" x2="102" y2="206" stroke="hsl(var(--border))" strokeWidth="1.5" strokeDasharray="3 4" />
+    <div className={`flex flex-col items-center ${className || ''}`}>
+      <svg
+        viewBox="-58 -160 116 380"
+        className="h-full w-auto"
+        role="img"
+        aria-label={`Esquema corporal · rodilla ${side}`}
+      >
+        <line x1="-42" y1="196" x2="42" y2="196" stroke="#D8D6E2" strokeWidth="1.6" strokeDasharray="4 6" />
 
-      {/* Cabeza, tronco y brazos */}
-      <g fill="none" stroke="hsl(var(--muted-foreground))" strokeOpacity="0.55" strokeWidth="7" strokeLinecap="round">
-        <circle cx="60" cy="26" r="11" />
-        <path d="M60 38 V 96" />
-        <path d="M60 56 L 34 84" />
-        <path d="M60 56 L 86 84" />
-      </g>
+        {/* Piernas */}
+        {[-16, 16].map((x) => (
+          <g key={x} transform={`translate(${x},0)`}>
+            <path d={FRONT.thigh} fill="none" stroke={C.ink} strokeWidth="2.4" strokeLinejoin="round" />
+            <g transform={`translate(0,${FRONT.knee.y})`}>
+              <path d={FRONT.kneeLine} fill="none" stroke={C.ink} strokeWidth="1.8" strokeLinecap="round" />
+              <path d={FRONT.shin} fill="none" stroke={C.ink} strokeWidth="2.4" strokeLinejoin="round" />
+              <g transform={`translate(0,${FRONT.knee.ankle})`}>
+                <path d={FRONT.foot} fill="none" stroke={C.ink} strokeWidth="2.4" strokeLinejoin="round" />
+              </g>
+            </g>
+          </g>
+        ))}
 
-      {/* Pierna sana */}
-      <path
-        d={healthyLeg}
-        fill="none"
-        stroke="hsl(var(--muted-foreground))"
-        strokeOpacity="0.45"
-        strokeWidth="7"
-        strokeLinecap="round"
-      />
+        {/* Torso y brazos */}
+        <g transform="translate(-30,-90)">
+          <path d={FRONT.upperArm} fill="none" stroke={C.muted} strokeWidth="2.2" strokeLinejoin="round" />
+          <g transform="translate(0,42)">
+            <path d={FRONT.foreArm} fill="none" stroke={C.muted} strokeWidth="2.2" strokeLinejoin="round" />
+          </g>
+        </g>
+        <g transform="translate(30,-90)">
+          <path d={FRONT.upperArm} fill="none" stroke={C.muted} strokeWidth="2.2" strokeLinejoin="round" />
+          <g transform="translate(0,42)">
+            <path d={FRONT.foreArm} fill="none" stroke={C.muted} strokeWidth="2.2" strokeLinejoin="round" />
+          </g>
+        </g>
 
-      {/* Pierna afectada */}
-      <path d={affectedLeg} fill="none" stroke="hsl(var(--area-ink))" strokeWidth="7" strokeLinecap="round" />
+        <path d={FRONT.torso} fill="none" stroke={C.ink} strokeWidth="2.6" strokeLinejoin="round" />
+        <path d={FRONT.pelvis} fill="none" stroke={C.ink} strokeWidth="1.6" strokeLinecap="round" opacity="0.5" />
+        <path d={FRONT.neck} fill="none" stroke={C.ink} strokeWidth="2.2" strokeLinecap="round" />
+        <path d={FRONT.head} fill="none" stroke={C.ink} strokeWidth="2.6" strokeLinejoin="round" />
 
-      {/* Rodilla trabajada */}
-      <circle cx={affectedKnee.x} cy={affectedKnee.y} r="15" fill="hsl(var(--area-accent) / 0.16)">
-        {animated && <animate attributeName="r" values="13;17;13" dur="3s" repeatCount="indefinite" />}
-      </circle>
-      <circle cx={affectedKnee.x} cy={affectedKnee.y} r="6.5" fill="hsl(var(--area-accent))" />
-      <circle cx={affectedKnee.x} cy={affectedKnee.y} r="11" fill="none" stroke="hsl(var(--area-accent) / 0.55)" strokeWidth="1.5" />
+        {/* Rodilla destacada */}
+        <circle cx={kneeX} cy={FRONT.knee.y} r="14" fill={C.cyan} opacity="0.2" />
+        <circle
+          cx={kneeX}
+          cy={FRONT.knee.y}
+          r="20"
+          fill="none"
+          stroke={C.cyan}
+          strokeWidth="1.2"
+          opacity="0.55"
+          strokeDasharray="3 4"
+        />
+        <circle cx={kneeX} cy={FRONT.knee.y} r="5" fill={C.cyan} />
+      </svg>
 
       {showLabel && (
-        <text
-          x="60"
-          y="220"
-          textAnchor="middle"
-          fill="hsl(var(--muted-foreground))"
-          style={{ fontSize: 9, letterSpacing: '0.08em', textTransform: 'uppercase' }}
-        >
-          Rodilla {side}
-        </text>
+        <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Rodilla {side}</div>
       )}
-    </svg>
+    </div>
   );
 }

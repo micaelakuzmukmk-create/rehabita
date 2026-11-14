@@ -1,115 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Pause, Play, RotateCcw, X } from 'lucide-react';
+import ExerciseFigure from './exercise/ExerciseFigure';
 import Chip from '@/components/ds/Chip';
+import { Button } from '@/components/ui/button';
+import { motionForCategory, MOTIONS } from '@/lib/exerciseMotion';
 
-const VARIANT_BY_CATEGORY = {
-  fuerza: 'squat',
-  potencia: 'squat',
-  propiocepcion: 'balance',
-  retorno_deportivo: 'balance',
-  movilidad: 'swing',
-  estiramiento: 'swing',
-};
+const DIFFICULTY = { baja: 'Baja', media: 'Media', alta: 'Alta' };
 
-const MOVEMENT = {
-  squat: { rotate: [0, 24, 0], y: [0, 5, 0] },
-  balance: { rotate: [-3, 6, -3], y: [0, 2, 0] },
-  swing: { rotate: [-16, 28, -16], y: 0 },
-};
-
-const GENERIC_STEPS = ['Posición inicial', 'Realizar el movimiento', 'Posición final'];
-
-const DIFFICULTY_LABELS = { baja: 'Baja', media: 'Media', alta: 'Alta' };
-
-function ExerciseFigure({ variant }) {
-  const movement = MOVEMENT[variant] || MOVEMENT.squat;
-
-  return (
-    <svg viewBox="0 0 160 230" className="h-[230px] w-auto" role="img" aria-label="Demostración visual del ejercicio">
-      <defs>
-        <marker id="exercise-arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(var(--area-ink))" />
-        </marker>
-      </defs>
-
-      <line x1="30" y1="210" x2="130" y2="210" stroke="hsl(var(--border))" strokeWidth="1.5" strokeDasharray="3 4" />
-
-      {/* Cuerpo estable */}
-      <g fill="none" stroke="hsl(var(--muted-foreground))" strokeOpacity="0.5" strokeWidth="7" strokeLinecap="round">
-        <circle cx="70" cy="34" r="12" />
-        <path d="M70 46 V 110" />
-        <path d="M70 66 L 46 96" />
-        <path d="M70 66 L 94 96" />
-        <path d="M70 110 L 58 162 L 54 208" />
-      </g>
-
-      {/* Pierna en movimiento */}
-      <motion.g
-        style={{ transformBox: 'fill-box', transformOrigin: 'top center' }}
-        animate={movement}
-        transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <path
-          d="M70 110 L 78 160 L 82 208"
-          fill="none"
-          stroke="hsl(var(--area-ink))"
-          strokeWidth="7"
-          strokeLinecap="round"
-        />
-        <circle cx="78" cy="160" r="13" fill="hsl(var(--area-accent) / 0.18)" />
-        <circle cx="78" cy="160" r="6" fill="hsl(var(--area-accent))" />
-      </motion.g>
-
-      {/* Trayectoria del movimiento */}
-      <path
-        d="M108 172 A 46 46 0 0 1 108 122"
-        fill="none"
-        stroke="hsl(var(--area-ink) / 0.45)"
-        strokeWidth="1.5"
-        strokeDasharray="3 4"
-        markerEnd="url(#exercise-arrow)"
-      />
-    </svg>
-  );
-}
-
-export default function ExerciseGuide({ exercise, onClose }) {
-  const [step, setStep] = useState(0);
+export default function ExerciseGuide({ exercise, side = 'derecha', onClose }) {
+  const [playing, setPlaying] = useState(true);
+  const [restartKey, setRestartKey] = useState(0);
+  const [speed, setSpeed] = useState(1);
 
   useEffect(() => {
     if (!exercise) return undefined;
-    setStep(0);
-    const timer = setInterval(() => setStep((s) => (s + 1) % GENERIC_STEPS.length), 1600);
-    return () => clearInterval(timer);
+    setPlaying(true);
+    setSpeed(1);
+    setRestartKey((k) => k + 1);
   }, [exercise]);
 
   useEffect(() => {
     if (!exercise) return undefined;
-    const onKey = (event) => { if (event.key === 'Escape') onClose?.(); };
+    const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [exercise, onClose]);
 
   if (!exercise) return null;
 
-  const variant = VARIANT_BY_CATEGORY[exercise.category] || 'squat';
+  const motionKey = motionForCategory(exercise.category);
+  const cfg = MOTIONS[motionKey];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/45 backdrop-blur-sm sm:items-center sm:p-6">
       <button type="button" aria-label="Cerrar" className="absolute inset-0 cursor-default" onClick={onClose} />
 
-      <div className="relative z-10 max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-t-3xl border border-border bg-card p-5 shadow-xl sm:rounded-3xl sm:p-6">
-        <div className="flex items-start justify-between gap-4">
+      <div className="relative z-10 max-h-[94vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl border border-border bg-card shadow-xl sm:rounded-3xl">
+        <div className="flex items-start justify-between gap-4 p-5 pb-0 sm:p-6 sm:pb-0">
           <div className="min-w-0">
-            <div className="eyebrow">Guía de ejecución</div>
-            <h2 className="mt-1.5 truncate font-heading text-xl font-semibold tracking-tight text-foreground">
+            <div className="eyebrow">Guía visual del ejercicio</div>
+            <h2 className="mt-1.5 font-heading text-[22px] font-semibold leading-tight tracking-tight text-foreground">
               {exercise.name}
             </h2>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
               {exercise.category && <Chip tone="cyan" className="capitalize">{exercise.category}</Chip>}
-              {exercise.difficulty && <Chip tone="neutral">Dificultad {DIFFICULTY_LABELS[exercise.difficulty] || exercise.difficulty}</Chip>}
               {exercise.target_muscle && <Chip tone="primary">{exercise.target_muscle}</Chip>}
+              {exercise.difficulty && <Chip tone="neutral">Dificultad {DIFFICULTY[exercise.difficulty] || exercise.difficulty}</Chip>}
             </div>
           </div>
           <button
@@ -122,32 +58,80 @@ export default function ExerciseGuide({ exercise, onClose }) {
           </button>
         </div>
 
-        <div className="mt-5 flex justify-center rounded-2xl bg-area-soft/60 py-4">
-          <ExerciseFigure variant={variant} />
+        {/* Animación */}
+        <div className="relative mt-4 bg-gradient-to-b from-white to-area-soft/60 px-3 py-4">
+          <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-1.5">
+            <span className="rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-area-ink shadow-sm">
+              {cfg.viewLabel}
+            </span>
+          </div>
+          <div className="absolute right-4 top-4 z-10">
+            <span className="rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-medium text-muted-foreground shadow-sm">
+              Pierna {side} · zona monitorizada
+            </span>
+          </div>
+
+          <div className="h-[292px] w-full sm:h-[330px]">
+            <ExerciseFigure motion={motionKey} side={side} playing={playing} restartKey={restartKey} speed={speed} />
+          </div>
         </div>
 
-        <ol className="mt-5 space-y-2">
-          {GENERIC_STEPS.map((label, index) => (
-            <li key={label} className="flex items-center gap-3">
-              <span
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold transition-colors ${
-                  index === step ? 'bg-area-accent text-slate-900' : 'bg-muted text-muted-foreground'
+        {/* Controles */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-border px-5 py-3 sm:px-6">
+          <Button size="sm" variant={playing ? 'outline' : 'default'} onClick={() => setPlaying((p) => !p)}>
+            {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+            {playing ? 'Pausar' : 'Reproducir'}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => { setRestartKey((k) => k + 1); setPlaying(true); }}>
+            <RotateCcw className="h-3.5 w-3.5" /> Repetir
+          </Button>
+
+          <div className="ml-auto flex items-center gap-0.5 rounded-full border border-border p-0.5">
+            {[1, 0.5].map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSpeed(s)}
+                className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+                  speed === s ? 'bg-area-soft text-area-ink' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {index + 1}
-              </span>
-              <span className={`text-[13px] ${index === step ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>
-                {label}
-              </span>
-            </li>
-          ))}
-        </ol>
+                {s}x
+              </button>
+            ))}
+          </div>
+        </div>
 
-        {(exercise.instructions || exercise.description) && (
-          <p className="mt-4 border-t border-border pt-4 text-[13px] leading-relaxed text-muted-foreground">
-            {exercise.instructions || exercise.description}
+        <div className="p-5 sm:p-6">
+          <div className="eyebrow">Secuencia del movimiento</div>
+          <ol className="mt-3 grid gap-2 sm:grid-cols-2">
+            {cfg.steps.map((step, i) => (
+              <li key={step} className="flex items-start gap-2.5">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-area-soft text-[10px] font-semibold text-area-ink">
+                  {i + 1}
+                </span>
+                <span className="text-[12px] leading-relaxed text-muted-foreground">{step}</span>
+              </li>
+            ))}
+          </ol>
+
+          {exercise.instructions && (
+            <div className="mt-4 rounded-xl border border-border bg-muted/60 p-3.5">
+              <div className="eyebrow">Indicación de tu kinesiólogo</div>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-foreground">{exercise.instructions}</p>
+            </div>
+          )}
+
+          {exercise.description && !exercise.instructions && (
+            <p className="mt-4 border-t border-border pt-4 text-[13px] leading-relaxed text-muted-foreground">
+              {exercise.description}
+            </p>
+          )}
+
+          <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+            La animación es una demostración visual del movimiento. Seguí las indicaciones de tu kinesiólogo.
           </p>
-        )}
+        </div>
       </div>
     </div>
   );

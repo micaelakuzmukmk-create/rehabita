@@ -168,7 +168,7 @@ export default function Plan() {
         )}
       </section>
 
-      <ExerciseGuide exercise={guide} onClose={() => setGuide(null)} />
+      <ExerciseGuide exercise={guide} side={patient.injury_side} onClose={() => setGuide(null)} />
     </div>
   );
 }
