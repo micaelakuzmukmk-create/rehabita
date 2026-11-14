@@ -58,8 +58,8 @@ export const EXERCISE_ANIMATIONS = {
     hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/9a738ce7b_Slides_hombre.mp4',
   },
   saltos_laterales: {
-    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/edfba5fba_Saltos_mujer.mp4',
-    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/fe78703a4_Saltos_hombre.mp4',
+    mujer: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/72f945653_Saltos_mujer_v2.mp4',
+    hombre: 'https://media.base44.com/videos/public/6ab87cc4d91f4c040f179413/38f13621d_Saltos_hombre_v2.mp4',
   },
 };
 

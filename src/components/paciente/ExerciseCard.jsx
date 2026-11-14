@@ -28,7 +28,7 @@ export default function ExerciseCard({ exercise, onOpen }) {
 
       {/* Miniatura animada: la misma representación que verá al abrir la guía */}
       <div className="h-[78px] w-[62px] shrink-0 overflow-hidden rounded-xl bg-area-soft/50">
-        <ExerciseAnimation name={exercise.name} gender={gender} fitting="cover" compact />
+        <ExerciseAnimation name={exercise.name} gender={gender} playing={false} fitting="cover" compact />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">

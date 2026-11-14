@@ -39,10 +39,18 @@ export default function ExerciseAnimation({
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || restartKey === 0) return;
     video.currentTime = 0;
-    video.play().catch(() => {});
+    if (playing) video.play().catch(() => {});
   }, [restartKey]);
+
+  // Con la animación detenida se muestra solo el primer cuadro, sin reproducir.
+  const paintFirstFrame = () => {
+    const video = videoRef.current;
+    if (!video || playing) return;
+    video.pause();
+    if (video.currentTime === 0) video.currentTime = 0.05;
+  };
 
   if (!asset.available || failed) {
     return <AnimationPlaceholder compact={compact} className={className} />;
@@ -54,12 +62,12 @@ export default function ExerciseAnimation({
       ref={videoRef}
       src={asset.url}
       className={cn('h-full w-full', fitting === 'cover' ? 'object-cover' : 'object-contain', className)}
-      autoPlay
       loop
       muted
       playsInline
-      preload="metadata"
+      preload={playing ? 'auto' : 'metadata'}
       aria-label={`Demostración de ${name} (${asset.gender})`}
+      onLoadedData={paintFirstFrame}
       onError={() => setFailed(true)}
     />
   );
