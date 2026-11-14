@@ -4,6 +4,7 @@ import { METRIC_MAP } from '@/lib/rehbaita';
 import { Button } from '@/components/ui/button';
 
 const LIVE = ['symmetry', 'load_distribution', 'stability', 'knee_flexion_angle'];
+const SECONDARY = ['load_distribution', 'stability', 'knee_flexion_angle'];
 
 export default function LiveMeasureStep({ calibration, exerciseNames, onFinal, onBack }) {
   const [vals, setVals] = useState(() => ({
@@ -29,9 +30,12 @@ export default function LiveMeasureStep({ calibration, exerciseNames, onFinal, o
     return () => clearInterval(tick);
   }, []);
 
+  const symmetryPct = Math.min(100, (vals.symmetry / METRIC_MAP.symmetry.max) * 100);
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-5">
+      {/* Estado de la medición */}
+      <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-[13px] font-medium text-primary">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-cyan opacity-70" />
@@ -41,11 +45,55 @@ export default function LiveMeasureStep({ calibration, exerciseNames, onFinal, o
         </div>
         <div className="font-mono text-sm text-muted-foreground tabular-nums">{fmt(secs)}</div>
       </div>
-      <div className="text-[11px] text-muted-foreground">Ejercicios: {exerciseNames.join(', ') || '—'}</div>
-      <div className="grid gap-2.5 sm:grid-cols-2">
-        {LIVE.map(k => <LiveCard key={k} k={k} value={vals[k]} />)}
+
+      {/* Nivel 1: ejercicio actual */}
+      <div>
+        <div className="eyebrow">Ejercicio actual</div>
+        <div className="mt-1 font-heading text-lg font-semibold leading-snug tracking-tight text-foreground">
+          {exerciseNames.join(' · ') || 'Sin ejercicios seleccionados'}
+        </div>
       </div>
-      <div className="flex items-center justify-between gap-3 pt-1">
+
+      {/* Nivel 2: indicador principal en vivo */}
+      <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="micro-label">Simetría en vivo</span>
+          <span className="text-[11px] text-muted-foreground">{qualitativeVals(vals.symmetry)}</span>
+        </div>
+        <div className="mt-2 flex items-baseline gap-1.5">
+          <span className="font-heading text-[52px] font-semibold leading-none tracking-[-0.03em] text-foreground tabular-nums">
+            {Math.round(vals.symmetry * 10) / 10}
+          </span>
+          <span className="font-heading text-lg font-medium text-slate-400">%</span>
+        </div>
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-brand-cyan transition-all duration-700 ease-out"
+            style={{ width: `${symmetryPct}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Nivel 3: indicadores complementarios */}
+      <div className="grid grid-cols-3 gap-4">
+        {SECONDARY.map((k) => {
+          const m = METRIC_MAP[k];
+          return (
+            <div key={k}>
+              <div className="micro-label">{m.label}</div>
+              <div className="mt-1 flex items-baseline gap-0.5">
+                <span className="font-heading text-lg font-semibold leading-none text-foreground tabular-nums">
+                  {Math.round(vals[k] * 10) / 10}
+                </span>
+                {m.unit && <span className="text-[11px] font-medium text-slate-400">{m.unit}</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Control único de la sesión */}
+      <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
         <Button variant="ghost" size="sm" onClick={onBack}>Atrás</Button>
         <Button onClick={() => onFinal(ref.current, secs)}>
           <Square className="h-4 w-4" /> Finalizar medición
@@ -55,27 +103,11 @@ export default function LiveMeasureStep({ calibration, exerciseNames, onFinal, o
   );
 }
 
-function LiveCard({ k, value }) {
-  const m = METRIC_MAP[k];
-  const pct = Math.min(100, (value / m.max) * 100);
-  return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="flex items-center justify-between gap-2">
-        <span className="micro-label">{m.label}</span>
-        <span className="h-1.5 w-1.5 rounded-full bg-brand-cyan" />
-      </div>
-      <div className="mt-2 flex items-baseline gap-1">
-        <span className="metric-value">{Math.round(value * 10) / 10}</span>
-        {m.unit && <span className="metric-unit">{m.unit}</span>}
-      </div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
-        <div
-          className="h-full rounded-full transition-all duration-700 ease-out"
-          style={{ width: `${pct}%`, background: m.color }}
-        />
-      </div>
-    </div>
-  );
+function qualitativeVals(v) {
+  if (v >= 90) return 'Muy alta';
+  if (v >= 80) return 'Alta';
+  if (v >= 70) return 'Moderada';
+  return 'A mejorar';
 }
 
 function rand(a, b) { return a + Math.random() * (b - a); }

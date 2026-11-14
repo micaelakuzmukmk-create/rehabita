@@ -8,7 +8,8 @@ import SectionCard from '@/components/ds/SectionCard';
 import Card from '@/components/ds/Card';
 import Chip from '@/components/ds/Chip';
 import Tabs from '@/components/ds/Tabs';
-import StatTile from '@/components/ds/StatTile';
+import MetricHero from '@/components/ds/MetricHero';
+import DataList from '@/components/ds/DataList';
 import LoadingState from '@/components/ds/LoadingState';
 import EmptyState from '@/components/ds/EmptyState';
 import { Button } from '@/components/ui/button';
@@ -105,6 +106,27 @@ export default function PatientDetail() {
   const currentSession = lastSession?.session_number ?? sessions.length;
   const totalSessions = plan?.total_sessions || null;
 
+  const metricDeltaOf = (key) =>
+    lastMetrics?.[key] != null && prevMetrics?.[key] != null
+      ? Math.round((lastMetrics[key] - prevMetrics[key]) * 10) / 10
+      : null;
+
+  const lastSessionRows = lastMetrics
+    ? METRICS.filter((m) => m.key !== 'symmetry').map((m) => {
+        const d = metricDeltaOf(m.key);
+        return {
+          label: m.label,
+          value:
+            lastMetrics[m.key] != null
+              ? `${Math.round(lastMetrics[m.key] * 10) / 10}${m.unit ? ` ${m.unit}` : ''}`
+              : '—',
+          delta: d,
+          deltaUnit: m.unit ? ` ${m.unit}` : '',
+          improved: d == null ? undefined : m.higherBetter ? d >= 0 : d <= 0,
+        };
+      })
+    : [];
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -134,27 +156,30 @@ export default function PatientDetail() {
             {patient.birth_date && <Chip tone="neutral">Nac. {format(parseISO(patient.birth_date), 'dd/MM/yyyy')}</Chip>}
           </div>
 
-          <dl className="grid grid-cols-2 gap-4 border-t border-border pt-4 sm:grid-cols-3 sm:gap-6">
-            <div>
-              <dt className="micro-label">Sesión actual</dt>
-              <dd className="mt-1 font-heading text-xl font-semibold tracking-tight text-foreground tabular-nums">
-                {currentSession}
-                {totalSessions ? <span className="text-sm font-medium text-muted-foreground"> / {totalSessions}</span> : null}
-              </dd>
+          <div className="flex flex-col gap-5 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
+            <MetricHero
+              label="Sesión actual"
+              value={currentSession}
+              unit={totalSessions ? `/ ${totalSessions}` : undefined}
+              caption={lastSession ? `Última registrada el ${format(parseISO(lastSession.date), 'dd/MM/yyyy')}` : 'Sin sesiones registradas'}
+            />
+
+            <div className="w-full sm:w-72">
+              <DataList
+                dense
+                rows={[
+                  { label: 'Etapa', value: PHASE_LABELS[plan?.current_phase] || '—' },
+                  {
+                    label: 'Simetría última sesión',
+                    value: lastMetrics?.symmetry != null ? `${Math.round(lastMetrics.symmetry * 10) / 10} %` : '—',
+                    delta: metricDeltaOf('symmetry'),
+                    deltaUnit: ' %',
+                  },
+                  { label: 'Plan vigente', value: plan?.title || '—' },
+                ]}
+              />
             </div>
-            <div>
-              <dt className="micro-label">Etapa</dt>
-              <dd className="mt-1 font-heading text-sm font-medium text-foreground">
-                {PHASE_LABELS[plan?.current_phase] || '—'}
-              </dd>
-            </div>
-            <div>
-              <dt className="micro-label">Última sesión</dt>
-              <dd className="mt-1 font-heading text-sm font-medium text-foreground">
-                {lastSession ? format(parseISO(lastSession.date), 'dd/MM/yyyy') : '—'}
-              </dd>
-            </div>
-          </dl>
+          </div>
         </div>
       </Card>
 
@@ -164,25 +189,16 @@ export default function PatientDetail() {
         <div className="space-y-4">
           <SectionCard icon={TrendingUp} title="Última sesión" description={lastSession ? format(parseISO(lastSession.date), "dd/MM/yyyy HH:mm") : undefined}>
             {lastMetrics ? (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {METRICS.map(m => {
-                  const current = lastMetrics[m.key];
-                  const previous = prevMetrics ? prevMetrics[m.key] : null;
-                  const delta = previous != null && current != null ? Math.round((current - previous) * 10) / 10 : null;
-                  return (
-                    <StatTile
-                      key={m.key}
-                      label={m.label}
-                      value={current}
-                      unit={m.unit}
-                      delta={delta}
-                      deltaUnit={m.unit}
-                      improved={delta == null ? undefined : m.higherBetter ? delta >= 0 : delta <= 0}
-                      progress={m.max && current != null ? Math.min(100, (current / m.max) * 100) : undefined}
-                      className="shadow-soft"
-                    />
-                  );
-                })}
+              <div className="space-y-6">
+                <MetricHero
+                  label="Simetría"
+                  value={lastMetrics.symmetry}
+                  unit="%"
+                  delta={metricDeltaOf('symmetry')}
+                  deltaUnit=" %"
+                  caption={prevMetrics ? 'vs. sesión anterior' : 'Primera medición registrada'}
+                />
+                <DataList rows={lastSessionRows} />
               </div>
             ) : <div className="text-sm text-muted-foreground">Sin mediciones registradas</div>}
           </SectionCard>

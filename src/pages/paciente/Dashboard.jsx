@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { METRIC_MAP, PHASE_LABELS, qualitative, metricDelta } from '@/lib/rehbaita';
-import ProgressRing from '@/components/paciente/ProgressRing';
-import StatCard from '@/components/paciente/StatCard';
 import EvolutionChart from '@/components/paciente/EvolutionChart';
 import PageHeader from '@/components/ds/PageHeader';
 import SectionCard from '@/components/ds/SectionCard';
-import Card from '@/components/ds/Card';
+import MetricHero from '@/components/ds/MetricHero';
+import DataList from '@/components/ds/DataList';
+import SectionHead from '@/components/ds/SectionHead';
 import Chip from '@/components/ds/Chip';
 import LoadingState from '@/components/ds/LoadingState';
 import { Button } from '@/components/ui/button';
@@ -115,6 +115,21 @@ export default function PatientDashboard() {
   const comparable = CARD_KEYS.filter(k => lastM?.[k] != null && prev?.[k] != null);
   const improvedCount = comparable.filter(k => metricDelta(k, lastM[k], prev[k])?.improved).length;
 
+  // Nivel 2: todos los indicadores en una sola lista, con su variación al lado.
+  const indicatorRows = CARD_KEYS.map((k) => {
+    const m = METRIC_MAP[k];
+    const val = lastM?.[k];
+    const d = val != null ? metricDelta(k, val, prev?.[k]) : null;
+    return {
+      label: m.label,
+      value: val == null ? '—' : `${Math.round(val * 10) / 10}${m.unit ? ` ${m.unit}` : ''}`,
+      hint: val == null ? 'Sin registro' : qualitative(k, val),
+      delta: d ? d.delta : null,
+      deltaUnit: m.unit ? ` ${m.unit}` : '',
+      improved: d ? d.improved : undefined,
+    };
+  });
+
   let motivation = 'Seguí con tu plan, cada sesión cuenta.';
   if (lastM && prev) {
     if (lastM.confidence_perceived > prev.confidence_perceived) motivation = '¡Tu confianza está creciendo!';
@@ -139,29 +154,29 @@ export default function PatientDashboard() {
         }
       />
 
-      {/* Progreso general + mensaje */}
-      <Card className="relative overflow-hidden">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-brand-soft blur-3xl" />
-        <div className="relative flex flex-col items-center gap-6 p-6 sm:flex-row sm:p-7">
-          <div className="flex flex-col items-center">
-            <ProgressRing value={score} size={140} color="#3B1A7B" label="progreso general" />
-          </div>
-          <div className="flex-1 text-center sm:text-left">
-            <div className="eyebrow flex items-center justify-center gap-1.5 sm:justify-start">
+      {/* Nivel 1: progreso general */}
+      <section className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-surface">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-28 -top-32 h-72 w-72 rounded-full bg-brand-soft blur-3xl" />
+        <div className="relative flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-8">
+          <MetricHero
+            label="Progreso general"
+            value={score}
+            unit="%"
+            delta={prevScore != null ? score - prevScore : null}
+            deltaUnit=" pts"
+            caption={prevScore != null ? 'vs. tu sesión anterior' : undefined}
+          />
+
+          <div className="h-px w-full shrink-0 bg-border sm:h-20 sm:w-px" />
+
+          <div className="min-w-0 flex-1">
+            <div className="eyebrow flex items-center gap-1.5">
               <HeartPulse className="h-3.5 w-3.5 text-brand-cyan" /> Tu mensaje de hoy
             </div>
-            <p className="mt-2 font-heading text-lg font-medium leading-snug text-foreground sm:text-xl">{motivation}</p>
-            {prevScore != null && (
-              <div className="mt-3 flex items-center justify-center gap-2 sm:justify-start">
-                <Chip tone={score >= prevScore ? 'primary' : 'warning'} dot>
-                  {score > prevScore ? `+${score - prevScore} pts` : score < prevScore ? `${score - prevScore} pts` : 'igual'}
-                </Chip>
-                <span className="text-[11px] text-muted-foreground">respecto de tu sesión anterior</span>
-              </div>
-            )}
+            <p className="mt-2 font-heading text-[15px] font-medium leading-snug text-foreground sm:text-base">{motivation}</p>
           </div>
         </div>
-      </Card>
+      </section>
 
       {/* Evolución */}
       <SectionCard
@@ -172,18 +187,20 @@ export default function PatientDashboard() {
         <EvolutionChart data={chartData} keys={EVOLUTION_KEYS} />
       </SectionCard>
 
-      {/* Indicadores actuales con comparación */}
+      {/* Nivel 2: indicadores agrupados, sin una tarjeta por dato */}
       <section>
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="section-title">Tus indicadores</h2>
-          {comparable.length > 0 && (
-            <span className="text-[11px] text-muted-foreground">
-              vs. sesión anterior: <span className="font-semibold text-primary">{improvedCount}</span> de {comparable.length} mejoraron
-            </span>
-          )}
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {CARD_KEYS.map(k => <StatCard key={k} metricKey={k} value={lastM?.[k]} prev={prev?.[k]} />)}
+        <SectionHead
+          title="Tus indicadores"
+          action={
+            comparable.length > 0 ? (
+              <span className="text-[11px] text-muted-foreground">
+                <span className="font-semibold text-primary">{improvedCount}</span> de {comparable.length} mejoraron
+              </span>
+            ) : undefined
+          }
+        />
+        <div className="rounded-2xl border border-border bg-card px-5 py-4 shadow-soft sm:px-6">
+          <DataList rows={indicatorRows} />
         </div>
       </section>
 

@@ -4,7 +4,8 @@ import SessionsCalendar from '@/components/paciente/SessionsCalendar';
 import PageHeader from '@/components/ds/PageHeader';
 import SectionCard from '@/components/ds/SectionCard';
 import LoadingState from '@/components/ds/LoadingState';
-import { CheckCircle2, Clock, XCircle, Frown, Smile, CalendarDays } from 'lucide-react';
+import MetricHero from '@/components/ds/MetricHero';
+import { CalendarDays } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const DEFAULT_TOTAL_SESSIONS = 24;
@@ -57,19 +58,17 @@ export default function PatientSessions() {
   const withoutPain = completed.length - withPain;
 
   const stats = [
-    { label: 'Realizadas', value: `${completed.length} / ${total}`, icon: CheckCircle2, tone: 'primary' },
-    { label: 'Por realizar', value: remaining, icon: Clock, tone: 'cyan' },
-    { label: 'Abandonadas', value: abandoned.length, icon: XCircle, tone: 'danger' },
-    { label: 'Con dolor', value: withPain, icon: Frown, tone: 'warning' },
-    { label: 'Sin dolor', value: withoutPain, icon: Smile, tone: 'success' },
+    { label: 'Por realizar', value: remaining, tone: 'cyan' },
+    { label: 'Abandonadas', value: abandoned.length, tone: 'danger' },
+    { label: 'Con dolor', value: withPain, tone: 'warning' },
+    { label: 'Sin dolor', value: withoutPain, tone: 'success' },
   ];
 
-  const ICON_TONES = {
-    primary: 'bg-secondary text-primary',
-    cyan: 'bg-accent text-brand-blue',
-    danger: 'bg-danger-soft text-danger',
-    warning: 'bg-warning-soft text-warning',
-    success: 'bg-success-soft text-success',
+  const DOT_TONES = {
+    cyan: 'bg-brand-cyan',
+    danger: 'bg-danger',
+    warning: 'bg-warning',
+    success: 'bg-success',
   };
 
   const sessionDates = sessionsAsc.map(s => s.date);
@@ -84,20 +83,32 @@ export default function PatientSessions() {
       />
 
       {/* Resumen */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        {stats.map((st) => {
-          const Icon = st.icon;
-          return (
-            <div key={st.label} className="card p-4">
-              <span className={`mb-3 flex h-8 w-8 items-center justify-center rounded-lg ${ICON_TONES[st.tone]}`}>
-                <Icon className="h-4 w-4" />
-              </span>
-              <div className="font-heading text-xl font-semibold leading-none tracking-tight text-foreground tabular-nums">{st.value}</div>
-              <div className="mt-1 text-[11px] text-muted-foreground">{st.label}</div>
-            </div>
-          );
-        })}
-      </div>
+      <section className="rounded-2xl border border-border bg-card px-5 py-5 shadow-surface sm:px-6">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-8">
+          <MetricHero
+            label="Sesiones realizadas"
+            value={completed.length}
+            unit={`/ ${total}`}
+            caption="de tu plan de rehabilitación"
+          />
+
+          <div className="hidden h-16 w-px shrink-0 bg-border sm:block" />
+
+          <div className="grid flex-1 grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+            {stats.map((st) => (
+              <div key={st.label}>
+                <div className="flex items-center gap-1.5">
+                  <span className={`h-1.5 w-1.5 rounded-full ${DOT_TONES[st.tone]}`} />
+                  <span className="micro-label">{st.label}</span>
+                </div>
+                <div className="mt-1 font-heading text-xl font-semibold leading-none text-foreground tabular-nums">
+                  {st.value}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Calendario de sesiones */}
       <SectionCard

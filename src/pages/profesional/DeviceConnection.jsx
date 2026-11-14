@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { setDeviceStatus } from '@/lib/deviceStatus';
 import useBleDevice, {
   DEVICE_NAME,
   SERVICE_UUID,
@@ -96,6 +97,13 @@ export default function DeviceConnection() {
   const connected = status === 'conectado';
   const connecting = status === 'conectando';
   const sessionActive = activeSession?.status === 'activa';
+
+  // Refleja el estado del wearable en el resto de la plataforma (módulo persistente).
+  useEffect(() => {
+    setDeviceStatus({ connected, name: deviceName || DEVICE_NAME, active: sessionActive });
+  }, [connected, deviceName, sessionActive]);
+
+  useEffect(() => () => setDeviceStatus({ connected: false, active: false }), []);
   const sessionInterrupted = activeSession?.status === 'interrumpida';
   const recent = !!lastSampleAt && now - lastSampleAt < SAMPLE_STALE_MS;
 
@@ -323,6 +331,7 @@ export default function DeviceConnection() {
           <Button
             onClick={connect}
             disabled={!supported || connecting || connected || busy}
+            variant={connected ? 'outline' : 'default'}
             className="h-11"
           >
             {connecting ? (
@@ -344,7 +353,7 @@ export default function DeviceConnection() {
           <Button
             onClick={finishMeasurement}
             disabled={!sessionActive || busy}
-            variant="secondary"
+            variant={sessionActive ? 'default' : 'outline'}
             className="h-11"
           >
             <Square className="h-4 w-4" /> Finalizar medición
@@ -353,7 +362,7 @@ export default function DeviceConnection() {
           <Button
             onClick={handleUnbind}
             disabled={(!connected && !sessionActive) || busy}
-            variant="outline"
+            variant="ghost"
             className="h-11"
           >
             <Unlink className="h-4 w-4" /> Desvincular

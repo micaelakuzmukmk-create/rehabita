@@ -3,6 +3,7 @@ import { Outlet, NavLink, useLocation, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import UserMenu from '@/components/UserMenu';
 import NavBadge from '@/components/NavBadge';
+import DeviceStatusPill from '@/components/DeviceStatusPill';
 import { usePatientBadges } from '@/hooks/usePatientBadges';
 import { PACIENTE_NAV, PROFESIONAL_NAV, AREA_LABELS } from '@/lib/navigation';
 
@@ -98,6 +99,7 @@ export default function Layout() {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              {isKinesiologo && <DeviceStatusPill />}
               <UserMenu />
             </div>
           </div>
